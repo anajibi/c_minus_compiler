@@ -60,9 +60,25 @@ def is_white_space(char):
     return re.fullmatch("\s", char) is not None
 
 
+def is_symbol(char):
+    return re.fullmatch("[;:,\[\](){}+\-*=<]", char) is not None
+
+
+def is_starting_comment(char):
+    return re.fullmatch("/", char) is not None
+
+
 def read_number():
     while buffer != "" and is_digit(buffer[0]):
         append_to_current_lexeme()
+    if buffer[0] and (not (is_symbol(buffer[0]) | is_white_space(buffer[0]) | is_starting_comment(buffer[0]))):
+        report_error("Invalid number")
+
+
+def report_error(type):
+    global current_lexeme
+    lexical_errors.append(LexicalError(current_lexeme, type))
+    current_lexeme = ""
 
 
 def write_lexical_errors():
