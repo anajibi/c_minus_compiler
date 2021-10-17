@@ -1,3 +1,6 @@
-# c_minus_compiler
+## C_Minus_Compiler
 Compiler for C-Minus custom language
 
+## Authors:
+#### Ali Najibi
+#### Alireza Honarbar
