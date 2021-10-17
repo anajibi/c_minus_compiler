@@ -5,16 +5,16 @@ from constants import TOKENS_FILE_NAME
 def main():
     tokens_file = open(TOKENS_FILE_NAME, "w")
     index = 0
-    tokens_list = []
+    tokens_list = dict()
 
     init_keywords()
 
     while (token := get_next_token()) is not None:
-        if len(tokens_list) < token[1]:
-            tokens_list.append([token[0]])
+        if tokens_list.get(token[1] - 1) is None:
+            tokens_list[token[1] - 1] = [token[0]]
         else:
             tokens_list[token[1] - 1].append(token[0])
-    for token_line in tokens_list:
+    for _, token_line in tokens_list.items():
         index += 1
         tokens_file.write(f"{index}.\t")
         for token in token_line:
