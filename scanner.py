@@ -1,4 +1,5 @@
 from constants import LEXICAL_ERRORS_FILE_NAME, INPUT_FILE_NAME
+import re
 
 symbol_table = set()
 lexical_error_log = open(LEXICAL_ERRORS_FILE_NAME, "a")
@@ -13,19 +14,43 @@ def read_new_line():
     global buffer
     global line_number
     buffer = input_file.readline()
-    line_number += 1
+    line_number += 11
     write_lexical_errors()
+
+
+def append_to_current_lexeme():
+    global current_lexeme
+    global buffer
+    current_lexeme = current_lexeme + buffer[0]
 
 
 def get_next_token():
     global buffer
     global line_number
+    global current_lexeme
+    token: str
     if buffer == "":
         read_new_line()
+    if is_digit(buffer[0]):
+        append_to_current_lexeme()
+        read_number()
 
     if buffer == "":
         return None
-    pass;
+
+    if current_lexeme != "":
+        return [current_lexeme, line_number]
+    else:
+        return get_next_token()
+
+
+def is_digit(char):
+    return re.fullmatch("\d", char) is not None
+
+
+def read_number():
+    while is_digit(buffer[0]):
+        append_to_current_lexeme()
 
 
 def write_lexical_errors():
