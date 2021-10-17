@@ -64,7 +64,9 @@ def get_next_token():
         append_to_current_lexeme()
         read_symbol()
         read_token = Token("SYMBOL", current_lexeme)
-
+    else:
+        report_error("Invalid input")
+        return get_next_token()
     current_lexeme = ""
     if read_token.lexeme != "":
         return [read_token, line_number]
@@ -105,20 +107,32 @@ def read_keyword_or_id():
         append_to_current_lexeme()
     if buffer[0] and (not (is_symbol(buffer[0]) | is_white_space(buffer[0]) | is_starting_comment(
             buffer[0]))):  # Todo: Couldn't figure out this?
-        report_error("Invalid input")  # Todo: When does this happen?
+        report_error("Invalid input")
+
+
+def read_and_dump_comment(stop_char):
+    while buffer[0] and buffer[0] != stop_char:
+        append_to_current_lexeme()
 
 
 def read_comment():
-    if re.fullmatch("/", buffer[0]) is not None:
-        while buffer != "":
+    if buffer != "" and is_starting_comment(buffer[0]):
+        append_to_current_lexeme()
+        while buffer != "" and buffer[0] != "\n":
             append_to_current_lexeme()
-        if not current_lexeme.endswith("\n"):  # Todo: Add EOF as well. (HOW?)
-            report_error("Unclosed comment")
-    elif re.fullmatch("[*]", buffer[0]) is not None:
-        while buffer != "":
-            append_to_current_lexeme()
-        if not current_lexeme.endswith("*/"):
-            report_error("Unclosed comment")
+    elif buffer != "" and re.fullmatch("[*]", buffer[0]) is not None:
+        while True:
+            read_and_dump_comment("*")
+            if buffer == "":
+                read_new_line()
+                if buffer == "":
+                    report_error("Unclosed comment")
+                    return
+            else:
+                append_to_current_lexeme()
+                if buffer != "" and buffer[0] == "/":
+                    append_to_current_lexeme()
+                    return
     else:
         report_error("Invalid input")
 
@@ -127,9 +141,9 @@ def read_symbol():
     pass  # Todo
 
 
-def report_error(type):
+def report_error(typ):
     global current_lexeme
-    lexical_errors.append(LexicalError(current_lexeme, type))
+    lexical_errors.append(LexicalError(current_lexeme, typ))
     current_lexeme = ""
 
 
