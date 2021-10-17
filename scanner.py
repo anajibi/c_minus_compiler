@@ -10,8 +10,12 @@ line_number = 0
 
 def get_next_token():
     global current_buffer
-    current_buffer = input_file.readline()
-    input_file.tell()
+    global line_number
+    if current_buffer == "":
+        current_buffer = input_file.readline()
+        line_number += 1
+    if current_buffer == "":
+        return None
     pass;
 
 
