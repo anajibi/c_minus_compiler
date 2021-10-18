@@ -1,13 +1,14 @@
-from constants import LEXICAL_ERRORS_FILE_NAME, INPUT_FILE_NAME, KEYWORDS
+from constants import LEXICAL_ERRORS_FILE_NAME, INPUT_FILE_NAME, KEYWORDS, SYMBOL_TABLE_FILE_NAME
 import re
 
 symbol_table = {}
 lexical_error_log = open(LEXICAL_ERRORS_FILE_NAME, "w")
+symbol_table_log = open(SYMBOL_TABLE_FILE_NAME, "w")
 input_file = open(INPUT_FILE_NAME, "r", encoding="UTF-8")
 current_lexeme = ""
 buffer = ""
 line_number = 0
-lexical_errors = []
+lexical_errors = dict()
 read_token = None
 
 
@@ -21,7 +22,6 @@ def read_new_line():
     global line_number
     buffer = input_file.readline()
     line_number += 1
-    write_lexical_errors()
 
 
 def append_to_current_lexeme():
@@ -37,7 +37,6 @@ def get_next_token():
     global current_lexeme
     global read_token
     token: str
-
     if buffer == "":
         read_new_line()
     if buffer == "":
@@ -45,17 +44,20 @@ def get_next_token():
     if is_digit(buffer[0]):
         append_to_current_lexeme()
         read_number()
-        read_token = Token("NUM", current_lexeme)
+        read_token = Token("NUM", current_lexeme, line_number)
     elif is_white_space(buffer[0]):
         buffer = buffer[1:]
-        return get_next_token()
+        test = get_next_token()
+        return test
     elif is_letter(buffer[0]):  # For Keywords & IDs
         append_to_current_lexeme()
         read_keyword_or_id()
         if current_lexeme in dict(list(symbol_table.items())[:8]):
-            read_token = Token("KEYWORD", current_lexeme)
+            read_token = Token("KEYWORD", current_lexeme, line_number)
         else:
-            read_token = Token("ID", current_lexeme)
+            if current_lexeme:
+                symbol_table[current_lexeme] = "ID"
+            read_token = Token("ID", current_lexeme, line_number)
     elif is_starting_comment(buffer[0]):
         append_to_current_lexeme()
         read_comment()
@@ -64,14 +66,14 @@ def get_next_token():
     elif is_symbol(buffer[0]):
         append_to_current_lexeme()
         read_symbol()
-        read_token = Token("SYMBOL", current_lexeme)
+        read_token = Token("SYMBOL", current_lexeme, line_number)
     else:
         append_to_current_lexeme()
         report_error("Invalid input")
         return get_next_token()
     current_lexeme = ""
     if read_token.lexeme != "":
-        return [read_token, line_number]
+        return read_token
     else:
         return get_next_token()
 
@@ -136,7 +138,8 @@ def read_comment():
             if buffer == "":
                 read_new_line()
                 if buffer == "":
-                    lexical_error_log.write(f"{starting_line}.\t({shorten(current_lexeme)}, Unclosed comment) ")
+                    current_lexeme = shorten(current_lexeme)
+                    report_error("Unclosed comment", starting_line)
                     current_lexeme = ""
                     return
             else:
@@ -158,11 +161,21 @@ def read_symbol():
         if buffer != "" and buffer[0] == "/":
             append_to_current_lexeme()
             report_error("Unmatched comment")
+    if buffer != "" and not (
+            is_white_space(buffer[0]) | is_starting_comment(buffer[0]) | is_digit(buffer[0]) | is_letter(
+            buffer[0]) | is_symbol(buffer[0])):
+        append_to_current_lexeme()
+        report_error("Invalid input")
 
 
-def report_error(typ):
+def report_error(error_type, line_num=-1):
     global current_lexeme
-    lexical_errors.append(LexicalError(current_lexeme, typ))
+    if line_num == -1:
+        line_num = line_number
+    if lexical_errors.get(line_num) is None:
+        lexical_errors[line_num] = [LexicalError(current_lexeme, error_type)]
+    else:
+        lexical_errors[line_num].append(LexicalError(current_lexeme, error_type))
     current_lexeme = ""
 
 
@@ -177,6 +190,24 @@ def write_lexical_errors():
     lexical_errors = []
 
 
+def print_symbol_table():
+    index = 0
+    for symbol in symbol_table:
+        index += 1
+        symbol_table_log.write(f"{index}.\t{symbol}\n")
+
+
+def print_lexical_errors():
+    if len(lexical_errors) != 0:
+        for key in sorted(lexical_errors.keys()):
+            lexical_error_log.write(f"{key}.\t")
+            for error in lexical_errors[key]:
+                lexical_error_log.write(f"({error.dumped_lexeme}, {error.error_type}) ")
+            lexical_error_log.write("\n")
+    else:
+        lexical_error_log.write("There is no lexical error.")
+
+
 class LexicalError:
     dumped_lexeme: str
     error_type: str
@@ -189,7 +220,9 @@ class LexicalError:
 class Token:
     type: str
     lexeme: str
+    line_num: int
 
-    def __init__(self, type, lexeme):
+    def __init__(self, type, lexeme, line_num):
         self.type = type
         self.lexeme = lexeme
+        self.line_num = line_num
