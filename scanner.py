@@ -101,7 +101,7 @@ def is_starting_comment(char):
 def read_number():
     while buffer != "" and is_digit(buffer[0]):
         append_to_current_lexeme()
-    if buffer[0] and (not (is_symbol(buffer[0]) | is_white_space(buffer[0]) | is_starting_comment(buffer[0]))):
+    if buffer != '' and (not (is_symbol(buffer[0]) | is_white_space(buffer[0]) | is_starting_comment(buffer[0]))):
         append_to_current_lexeme()
         report_error("Invalid number")
 
@@ -109,7 +109,7 @@ def read_number():
 def read_keyword_or_id():
     while buffer != "" and (is_digit(buffer[0]) or is_letter(buffer[0])):
         append_to_current_lexeme()
-    if buffer[0] and (not (is_symbol(buffer[0]) | is_white_space(buffer[0]) | is_starting_comment(
+    if buffer != '' and (not (is_symbol(buffer[0]) | is_white_space(buffer[0]) | is_starting_comment(
             buffer[0]))):
         append_to_current_lexeme()
         report_error("Invalid input")
@@ -148,8 +148,6 @@ def read_comment():
                     append_to_current_lexeme()
                     return
     else:
-        if buffer != "":
-            append_to_current_lexeme()
         report_error("Invalid input")
 
 
@@ -157,15 +155,20 @@ def read_symbol():
     if current_lexeme == "=":
         if buffer != "" and buffer[0] == "=":
             append_to_current_lexeme()
+        if buffer != "" and not (
+                is_white_space(buffer[0]) | is_starting_comment(buffer[0]) | is_digit(buffer[0]) |
+                is_letter(buffer[0]) | is_symbol(buffer[0])):
+            append_to_current_lexeme()
+            report_error("Invalid input")
     elif current_lexeme == "*":
         if buffer != "" and buffer[0] == "/":
             append_to_current_lexeme()
             report_error("Unmatched comment")
-    if buffer != "" and not (
-            is_white_space(buffer[0]) | is_starting_comment(buffer[0]) | is_digit(buffer[0]) | is_letter(
-            buffer[0]) | is_symbol(buffer[0])):
-        append_to_current_lexeme()
-        report_error("Invalid input")
+        if buffer != "" and not (
+                is_white_space(buffer[0]) | is_starting_comment(buffer[0]) | is_digit(buffer[0]) |
+                is_letter(buffer[0]) | is_symbol(buffer[0])):
+            append_to_current_lexeme()
+            report_error("Invalid input")
 
 
 def report_error(error_type, line_num=-1):
