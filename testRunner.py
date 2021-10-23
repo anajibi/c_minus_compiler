@@ -4,9 +4,9 @@ from constants import LEXICAL_ERRORS_FILE_NAME, SYMBOL_TABLE_FILE_NAME, TOKENS_F
 
 
 def compare():
-    index = 0
+    index = 1
     while index < 11:
-        test_case_id = "C:\\Users\\Ali Najibi\\Desktop\\PA1_testcases1.3\\T10\\"
+        test_case_id = f"C:\\Users\\Ali Najibi\\Desktop\\PA1_testcases1.3\\T{'0' if index < 10 else ''}{index}\\"
         input_txt = open(test_case_id + "input.txt", "r").read()
         open("input.txt", "w").write(input_txt)
         os.system('python compiler.py')
