@@ -15,8 +15,10 @@ def main():
             tokens_file.write("\n")
 
     init_keywords()
-
-    while (token := get_next_token()) is not None:
+    while True:
+        token = get_next_token()
+        if token is None:
+            break
         if tokens_list.get(token.line_num - 1) is None:
             tokens_list[token.line_num - 1] = [token]
         else:
