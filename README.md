@@ -3,4 +3,4 @@ Compiler for C-Minus custom language
 
 ## Authors:
 #### Ali Najibi
-#### Alireza Honarbar
+#### Alireza Honarvar
