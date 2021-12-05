@@ -1,4 +1,5 @@
 from enum import Enum
+from types import Union
 
 
 class Nonterminal(Enum):
@@ -47,3 +48,66 @@ class Nonterminal(Enum):
     ARGS = "Args"
     ARG_LIST = "Arg-list"
     ARG_LIST_PRIME = "Arg-list-prime"
+
+
+class TokenType(Enum):
+    NUM = "NUM"
+    KEYWORD = "KEYWORD"
+    ID = "ID"
+    SYMBOL = "SYMBOL"
+    EOF = "EOF"
+
+
+class TransitionType(Enum):
+    T = "TERMINAL"
+    NT = "NON-TERMINAL"
+
+
+class Token:
+    type: TokenType
+    lexeme: str
+    line_num: int
+
+    def __init__(self, type: TokenType, lexeme, line_num):
+        self.type = type
+        self.lexeme = lexeme
+        self.line_num = line_num
+
+    def __str__(self):
+        return f"({self.type.value}, {self.lexeme})"
+
+
+class T_ID:
+    type: TokenType
+    lexeme: str
+
+    def __init__(self, type: TokenType, lexeme):
+        self.type = type
+        self.lexeme = lexeme
+
+
+class State:
+    nonterminal: Nonterminal
+    state: int
+
+    def __init__(self, nonterminal, state):
+        self.nonterminal = nonterminal
+        self.state = state
+
+
+class Transition:
+    dest_state: int
+    identifier: Union[str, Nonterminal, TokenType, T_ID]
+
+    def __init__(self, dest_state: int, identifier):
+        self.dest_state = dest_state
+        self.identifier = identifier
+
+
+class NTerminalInfo:
+    first: list[str]
+    follow: list[str]
+
+    def __init__(self, first, follow):
+        self.first = first
+        self.follow = follow

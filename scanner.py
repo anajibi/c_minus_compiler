@@ -1,5 +1,7 @@
-from constants import LEXICAL_ERRORS_FILE_NAME, INPUT_FILE_NAME, KEYWORDS, SYMBOL_TABLE_FILE_NAME, TokenType, Token
+from constants import LEXICAL_ERRORS_FILE_NAME, INPUT_FILE_NAME, KEYWORDS, SYMBOL_TABLE_FILE_NAME
 import re
+
+from declarations import Token, TokenType
 
 symbol_table = {}
 lexical_error_log = open(LEXICAL_ERRORS_FILE_NAME, "w")

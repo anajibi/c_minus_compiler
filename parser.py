@@ -1,7 +1,7 @@
-from anytree import Node, RenderTree
-from constants import TokenType, State, T_DIAGRAMS, Token, Transition, N_TERMINALS_INFO, T_ID, EPSILON
+from anytree import Node
+from constants import T_DIAGRAMS, N_TERMINALS_INFO, EPSILON
 from scanner import get_next_token
-from nonterminals import Nonterminal as NT
+from declarations import Nonterminal as NT, Token, State, Transition, TokenType, T_ID
 
 
 def match(identifier: Transition.identifier, curr_token: Token):
