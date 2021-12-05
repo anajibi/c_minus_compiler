@@ -52,5 +52,8 @@ def parse():
                     curr_state = State(identifier, 0)
                     head = Node(identifier, head)
             else:
-                pass
-                # TODO panick mode
+                while curr_token.type in N_TERMINALS_INFO[curr_state.nonterminal].follow \
+                        or curr_token.lexeme in N_TERMINALS_INFO[curr_state.nonterminal].follow:
+                    curr_token = get_next_token()
+                head = head.parent
+    print("Done")
