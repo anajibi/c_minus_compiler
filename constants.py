@@ -1,6 +1,8 @@
 from enum import Enum
 from typing import Callable, Union
 
+from nonterminals import Nonterminal as NT
+
 INPUT_FILE_NAME = "input.txt"
 SYMBOL_TABLE_FILE_NAME = "symbol_table.txt"
 TOKENS_FILE_NAME = "tokens.txt"
@@ -38,7 +40,7 @@ class Token:
         return f"({self.type.value}, {self.lexeme})"
 
 
-class TokenIdentifier:
+class T_ID:
     type: TokenType
     lexeme: str
 
@@ -48,7 +50,7 @@ class TokenIdentifier:
 
 
 class State:
-    nonterminal: str
+    nonterminal: NT
     state: int
 
     def __init__(self, nonterminal, state):
@@ -58,7 +60,7 @@ class State:
 
 class Transition:
     dest_state: int
-    identifier: Union[str, TokenType, TokenIdentifier]
+    identifier: Union[str, NT, TokenType, T_ID]
 
     def __init__(self, dest_state: int, identifier):
         self.dest_state = dest_state
@@ -74,40 +76,58 @@ class NTerminalInfo:
         self.follow = follow
 
 
-N_TERMINALS_INFO: dict[str, NTerminalInfo] = {
-    "Program": NTerminalInfo([], [])
+N_TERMINALS_INFO: dict[NT, NTerminalInfo] = {
+    NT.PROGRAM: NTerminalInfo([], [])
 }
 
-T_DIAGRAMS: dict[str, list[list[Transition]]] = {
-    "Program": [
-        [Transition(1, "Declaration-list")],
-        [Transition(2, TokenIdentifier(TokenType.EOF, "$"))],
+T_DIAGRAMS: dict[NT, list[list[Transition]]] = {
+    NT.PROGRAM: [
+        [Transition(1, NT.DECLARATION_LIST)],
+        [Transition(2, T_ID(TokenType.EOF, "$"))],
         []
     ],
-    "Declaration-list": [
-        [Transition(1, "Declaration"), Transition(2, EPSILON)],
-        [Transition(2, "Declaration-list")],
+    NT.DECLARATION_LIST: [
+        [Transition(1, NT.DECLARATION), Transition(2, EPSILON)],
+        [Transition(2, NT.DECLARATION_LIST)],
         []
     ],
-    "Declaration": [
-        [Transition(1, "Declaration-initial")],
-        [Transition(2, "Declaration-prime")],
+    NT.DECLARATION: [
+        [Transition(1, NT.DECLARATION_INITIAL)],
+        [Transition(2, NT.DECLARATION_PRIME)],
         []
     ],
-    "Declaration-initial": [
-        [Transition(1, "Type-specifier")],
+    NT.DECLARATION_INITIAL: [
+        [Transition(1, NT.TYPE_SPECIFIER)],
         [Transition(2, TokenType.ID)],
         []
     ],
-    "Declaration-prime": [
-        [Transition(1, "Fun-declaration-prime"), Transition(1, "Var-declaration-prime")],
+    NT.DECLARATION_PRIME: [
+        [Transition(1, NT.FUN_DECLARATION_PRIME), Transition(1, NT.VAR_DECLARATION_PRIME)],
         []
     ],
-    "Var-declaration-prime": [
-        [Transition(4, TokenIdentifier(TokenType.SYMBOL, ";")), Transition(1, TokenIdentifier(TokenType.SYMBOL, "["))],
+    NT.VAR_DECLARATION_PRIME: [
+        [Transition(4, T_ID(TokenType.SYMBOL, ";")), Transition(1, T_ID(TokenType.SYMBOL, "["))],
         [Transition(2, TokenType.NUM)],
-        [Transition(3, TokenIdentifier(TokenType.SYMBOL, "]"))],
-        [Transition(4, TokenIdentifier(TokenType.SYMBOL, ";"))],
+        [Transition(3, T_ID(TokenType.SYMBOL, "]"))],
+        [Transition(4, T_ID(TokenType.SYMBOL, ";"))],
+        []
+    ],
+    NT.FUN_DECLARATION_PRIME: [
+        [Transition(1, T_ID(TokenType.SYMBOL, "("))],
+        [Transition(2, NT.PARAMS)],
+        [Transition(3, T_ID(TokenType.SYMBOL, ")"))],
+        [Transition(4, NT.COMPOUND_STMT)],
+        []
+    ],
+    NT.TYPE_SPECIFIER: [
+        [Transition(1, T_ID(TokenType.KEYWORD, "int")), Transition(1, T_ID(TokenType.KEYWORD, "void"))],
+        []
+    ],
+    NT.PARAMS: [
+        [Transition(1, T_ID(TokenType.KEYWORD, "int")), Transition(4, T_ID(TokenType.KEYWORD, "void"))],
+        [Transition(2, TokenType.ID)],
+        [Transition(3, NT.PARAM_PRIME)],
+        [Transition(4, NT.PARAM_LIST)],
         []
     ]
 
