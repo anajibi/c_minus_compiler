@@ -1,4 +1,4 @@
-from constants import LEXICAL_ERRORS_FILE_NAME, INPUT_FILE_NAME, KEYWORDS, SYMBOL_TABLE_FILE_NAME, TokenType
+from constants import LEXICAL_ERRORS_FILE_NAME, INPUT_FILE_NAME, KEYWORDS, SYMBOL_TABLE_FILE_NAME, TokenType, Token
 import re
 
 symbol_table = {}
@@ -218,14 +218,3 @@ class LexicalError:
     def __init__(self, dumped_lexeme, error_type):
         self.dumped_lexeme = dumped_lexeme
         self.error_type = error_type
-
-
-class Token:
-    type: TokenType
-    lexeme: str
-    line_num: int
-
-    def __init__(self, type: TokenType, lexeme, line_num):
-        self.type = type
-        self.lexeme = lexeme
-        self.line_num = line_num
