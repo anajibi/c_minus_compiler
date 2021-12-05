@@ -33,14 +33,14 @@ def parse():
     curr_state = State(NT.PROGRAM, 0)
     curr_token = get_next_token()
     while not accepted:
-        state_transitions = T_DIAGRAMS[curr_state.nonterminal][curr_state.state]
-        if len(state_transitions) == 0:
+        if len(T_DIAGRAMS[curr_state.nonterminal]) == curr_state.state:
             if len(stack) == 0:
                 accepted = True
             else:
                 curr_state = stack.pop()
                 head = head.parent
         else:
+            state_transitions = T_DIAGRAMS[curr_state.nonterminal][curr_state.state]
             transition = find_matching_transition(state_transitions, curr_token)
             if transition is not None:
                 identifier = transition.identifier
