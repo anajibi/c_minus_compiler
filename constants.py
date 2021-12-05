@@ -1,5 +1,15 @@
+from enum import Enum
+
 INPUT_FILE_NAME = "input.txt"
 SYMBOL_TABLE_FILE_NAME = "symbol_table.txt"
 TOKENS_FILE_NAME = "tokens.txt"
 LEXICAL_ERRORS_FILE_NAME = "lexical_errors.txt"
 KEYWORDS = ['if', 'else', 'void', 'int', 'repeat', 'break', 'until', 'return', 'endif']
+
+
+class TokenType(Enum):
+    NUM = "NUM"
+    KEYWORD = "KEYWORD"
+    ID = "ID"
+    SYMBOL = "SYMBOL"
+    EOF = "EOF"

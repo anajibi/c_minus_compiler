@@ -1,4 +1,4 @@
-from constants import LEXICAL_ERRORS_FILE_NAME, INPUT_FILE_NAME, KEYWORDS, SYMBOL_TABLE_FILE_NAME
+from constants import LEXICAL_ERRORS_FILE_NAME, INPUT_FILE_NAME, KEYWORDS, SYMBOL_TABLE_FILE_NAME, TokenType
 import re
 
 symbol_table = {}
@@ -40,11 +40,11 @@ def get_next_token():
     if buffer == "":
         read_new_line()
     if buffer == "":
-        return None
+        return Token(TokenType.EOF, "$", line_number)
     if is_digit(buffer[0]):
         append_to_current_lexeme()
         read_number()
-        read_token = Token("NUM", current_lexeme, line_number)
+        read_token = Token(TokenType.NUM, current_lexeme, line_number)
     elif is_white_space(buffer[0]):
         buffer = buffer[1:]
         test = get_next_token()
@@ -53,11 +53,11 @@ def get_next_token():
         append_to_current_lexeme()
         read_keyword_or_id()
         if current_lexeme in dict(list(symbol_table.items())[:8]):
-            read_token = Token("KEYWORD", current_lexeme, line_number)
+            read_token = Token(TokenType.KEYWORD, current_lexeme, line_number)
         else:
             if current_lexeme:
                 symbol_table[current_lexeme] = "ID"
-            read_token = Token("ID", current_lexeme, line_number)
+            read_token = Token(TokenType.ID, current_lexeme, line_number)
     elif is_starting_comment(buffer[0]):
         append_to_current_lexeme()
         read_comment()
@@ -66,7 +66,7 @@ def get_next_token():
     elif is_symbol(buffer[0]):
         append_to_current_lexeme()
         read_symbol()
-        read_token = Token("SYMBOL", current_lexeme, line_number)
+        read_token = Token(TokenType.SYMBOL, current_lexeme, line_number)
     else:
         append_to_current_lexeme()
         report_error("Invalid input")
@@ -221,11 +221,11 @@ class LexicalError:
 
 
 class Token:
-    type: str
+    type: TokenType
     lexeme: str
     line_num: int
 
-    def __init__(self, type, lexeme, line_num):
+    def __init__(self, type: TokenType, lexeme, line_num):
         self.type = type
         self.lexeme = lexeme
         self.line_num = line_num
