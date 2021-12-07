@@ -1,5 +1,5 @@
 from enum import Enum
-from types import Union
+from typing import Union
 
 
 class Nonterminal(Enum):
@@ -84,6 +84,9 @@ class T_ID:
     def __init__(self, type: TokenType, lexeme):
         self.type = type
         self.lexeme = lexeme
+
+    def __eq__(self, other):
+        return isinstance(other, T_ID) and self.type == other.type and self.lexeme == other.lexeme
 
 
 class State:
