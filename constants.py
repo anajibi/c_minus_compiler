@@ -140,7 +140,8 @@ N_TERMINALS_INFO: dict[NT, NTerminalInfo] = {
             T_ID(TokenType.SYMBOL, "{"), T_ID(TokenType.SYMBOL, "}"), T_ID(TokenType.KEYWORD, "break"),
             T_ID(TokenType.KEYWORD, "if"),
             T_ID(TokenType.KEYWORD, "repeat"), T_ID(TokenType.KEYWORD, "return"),
-            T_ID(TokenType.KEYWORD, "int"), T_ID(TokenType.KEYWORD, "void")
+            T_ID(TokenType.KEYWORD, "int"), T_ID(TokenType.KEYWORD, "void"),
+            T_ID(TokenType.KEYWORD, "endif"), T_ID(TokenType.KEYWORD, "else"), T_ID(TokenType.KEYWORD, "until")
         ]
     ),
     NT.STATEMENT_LIST: NTerminalInfo(
@@ -160,7 +161,12 @@ N_TERMINALS_INFO: dict[NT, NTerminalInfo] = {
             T_ID(TokenType.KEYWORD, "repeat"), T_ID(TokenType.KEYWORD, "return")
         ],
         [
-
+            TokenType.ID, T_ID(TokenType.SYMBOL, ";"), TokenType.NUM,
+            T_ID(TokenType.SYMBOL, "("),
+            T_ID(TokenType.SYMBOL, "{"), T_ID(TokenType.SYMBOL, "}"), T_ID(TokenType.KEYWORD, "break"),
+            T_ID(TokenType.KEYWORD, "if"),
+            T_ID(TokenType.KEYWORD, "repeat"), T_ID(TokenType.KEYWORD, "return"),
+            T_ID(TokenType.KEYWORD, "endif"), T_ID(TokenType.KEYWORD, "else"), T_ID(TokenType.KEYWORD, "until")
         ]
     ),
     NT.EXPRESSION_STMT: NTerminalInfo(
@@ -169,7 +175,12 @@ N_TERMINALS_INFO: dict[NT, NTerminalInfo] = {
             T_ID(TokenType.KEYWORD, "break")
         ],
         [
-
+            TokenType.ID, T_ID(TokenType.SYMBOL, ";"), TokenType.NUM,
+            T_ID(TokenType.SYMBOL, "("),
+            T_ID(TokenType.SYMBOL, "{"), T_ID(TokenType.SYMBOL, "}"), T_ID(TokenType.KEYWORD, "break"),
+            T_ID(TokenType.KEYWORD, "if"),
+            T_ID(TokenType.KEYWORD, "repeat"), T_ID(TokenType.KEYWORD, "return"),
+            T_ID(TokenType.KEYWORD, "endif"), T_ID(TokenType.KEYWORD, "else"), T_ID(TokenType.KEYWORD, "until")
         ]
     ),
     NT.SELECTION_STMT: NTerminalInfo(
@@ -177,7 +188,12 @@ N_TERMINALS_INFO: dict[NT, NTerminalInfo] = {
             T_ID(TokenType.KEYWORD, "if")
         ],
         [
-
+            TokenType.ID, T_ID(TokenType.SYMBOL, ";"), TokenType.NUM,
+            T_ID(TokenType.SYMBOL, "("),
+            T_ID(TokenType.SYMBOL, "{"), T_ID(TokenType.SYMBOL, "}"), T_ID(TokenType.KEYWORD, "break"),
+            T_ID(TokenType.KEYWORD, "if"),
+            T_ID(TokenType.KEYWORD, "repeat"), T_ID(TokenType.KEYWORD, "return"),
+            T_ID(TokenType.KEYWORD, "endif"), T_ID(TokenType.KEYWORD, "else"), T_ID(TokenType.KEYWORD, "until")
         ]
     ),
     NT.ELSE_STMT: NTerminalInfo(
@@ -185,7 +201,12 @@ N_TERMINALS_INFO: dict[NT, NTerminalInfo] = {
             T_ID(TokenType.KEYWORD, "endif"), T_ID(TokenType.KEYWORD, "else")
         ],
         [
-
+            TokenType.ID, T_ID(TokenType.SYMBOL, ";"), TokenType.NUM,
+            T_ID(TokenType.SYMBOL, "("),
+            T_ID(TokenType.SYMBOL, "{"), T_ID(TokenType.SYMBOL, "}"), T_ID(TokenType.KEYWORD, "break"),
+            T_ID(TokenType.KEYWORD, "if"),
+            T_ID(TokenType.KEYWORD, "repeat"), T_ID(TokenType.KEYWORD, "return"),
+            T_ID(TokenType.KEYWORD, "endif"), T_ID(TokenType.KEYWORD, "else"), T_ID(TokenType.KEYWORD, "until")
         ]
     ),
     NT.ITERATION_STMT: NTerminalInfo(
@@ -193,7 +214,12 @@ N_TERMINALS_INFO: dict[NT, NTerminalInfo] = {
             T_ID(TokenType.KEYWORD, "repeat")
         ],
         [
-
+            TokenType.ID, T_ID(TokenType.SYMBOL, ";"), TokenType.NUM,
+            T_ID(TokenType.SYMBOL, "("),
+            T_ID(TokenType.SYMBOL, "{"), T_ID(TokenType.SYMBOL, "}"), T_ID(TokenType.KEYWORD, "break"),
+            T_ID(TokenType.KEYWORD, "if"),
+            T_ID(TokenType.KEYWORD, "repeat"), T_ID(TokenType.KEYWORD, "return"),
+            T_ID(TokenType.KEYWORD, "endif"), T_ID(TokenType.KEYWORD, "else"), T_ID(TokenType.KEYWORD, "until")
         ]
     ),
     NT.RETURN_STMT: NTerminalInfo(
@@ -201,7 +227,12 @@ N_TERMINALS_INFO: dict[NT, NTerminalInfo] = {
             T_ID(TokenType.KEYWORD, "return")
         ],
         [
-
+            TokenType.ID, T_ID(TokenType.SYMBOL, ";"), TokenType.NUM,
+            T_ID(TokenType.SYMBOL, "("),
+            T_ID(TokenType.SYMBOL, "{"), T_ID(TokenType.SYMBOL, "}"), T_ID(TokenType.KEYWORD, "break"),
+            T_ID(TokenType.KEYWORD, "if"),
+            T_ID(TokenType.KEYWORD, "repeat"), T_ID(TokenType.KEYWORD, "return"),
+            T_ID(TokenType.KEYWORD, "endif"), T_ID(TokenType.KEYWORD, "else"), T_ID(TokenType.KEYWORD, "until")
         ]
     ),
     NT.RETURN_STMT_PRIME: NTerminalInfo(
@@ -209,7 +240,12 @@ N_TERMINALS_INFO: dict[NT, NTerminalInfo] = {
             TokenType.ID, T_ID(TokenType.SYMBOL, ";"), TokenType.NUM, T_ID(TokenType.SYMBOL, "(")
         ],
         [
-
+            TokenType.ID, T_ID(TokenType.SYMBOL, ";"), TokenType.NUM,
+            T_ID(TokenType.SYMBOL, "("),
+            T_ID(TokenType.SYMBOL, "{"), T_ID(TokenType.SYMBOL, "}"), T_ID(TokenType.KEYWORD, "break"),
+            T_ID(TokenType.KEYWORD, "if"),
+            T_ID(TokenType.KEYWORD, "repeat"), T_ID(TokenType.KEYWORD, "return"),
+            T_ID(TokenType.KEYWORD, "endif"), T_ID(TokenType.KEYWORD, "else"), T_ID(TokenType.KEYWORD, "until")
         ]
     ),
     NT.EXPRESSION: NTerminalInfo(
@@ -217,7 +253,8 @@ N_TERMINALS_INFO: dict[NT, NTerminalInfo] = {
             TokenType.ID, TokenType.NUM, T_ID(TokenType.SYMBOL, "(")
         ],
         [
-
+            T_ID(TokenType.SYMBOL, ";"), T_ID(TokenType.SYMBOL, "]"), T_ID(TokenType.SYMBOL, ")"),
+            T_ID(TokenType.SYMBOL, ",")
         ]
     ),
     NT.B: NTerminalInfo(
@@ -227,7 +264,8 @@ N_TERMINALS_INFO: dict[NT, NTerminalInfo] = {
             T_ID(TokenType.SYMBOL, "-"), T_ID(TokenType.SYMBOL, "*"), EPSILON
         ],
         [
-
+            T_ID(TokenType.SYMBOL, ";"), T_ID(TokenType.SYMBOL, "]"), T_ID(TokenType.SYMBOL, ")"),
+            T_ID(TokenType.SYMBOL, ",")
         ]
     ),
     NT.H: NTerminalInfo(
@@ -237,7 +275,8 @@ N_TERMINALS_INFO: dict[NT, NTerminalInfo] = {
             T_ID(TokenType.SYMBOL, "-"), T_ID(TokenType.SYMBOL, "*"), EPSILON
         ],
         [
-
+            T_ID(TokenType.SYMBOL, ";"), T_ID(TokenType.SYMBOL, "]"), T_ID(TokenType.SYMBOL, ")"),
+            T_ID(TokenType.SYMBOL, ",")
         ]
     ),
     NT.SIMPLE_EXPRESSION_ZEGOND: NTerminalInfo(
@@ -245,7 +284,8 @@ N_TERMINALS_INFO: dict[NT, NTerminalInfo] = {
             TokenType.NUM, T_ID(TokenType.SYMBOL, "(")
         ],
         [
-
+            T_ID(TokenType.SYMBOL, ";"), T_ID(TokenType.SYMBOL, "]"), T_ID(TokenType.SYMBOL, ")"),
+            T_ID(TokenType.SYMBOL, ",")
         ]
     ),
     NT.SIMPLE_EXPRESSION_PRIME: NTerminalInfo(
@@ -255,7 +295,8 @@ N_TERMINALS_INFO: dict[NT, NTerminalInfo] = {
             T_ID(TokenType.SYMBOL, "-"), T_ID(TokenType.SYMBOL, "*"), EPSILON
         ],
         [
-
+            T_ID(TokenType.SYMBOL, ";"), T_ID(TokenType.SYMBOL, "]"), T_ID(TokenType.SYMBOL, ")"),
+            T_ID(TokenType.SYMBOL, ",")
         ]
     ),
     NT.C: NTerminalInfo(
@@ -263,7 +304,8 @@ N_TERMINALS_INFO: dict[NT, NTerminalInfo] = {
             T_ID(TokenType.SYMBOL, "<"), T_ID(TokenType.SYMBOL, "=="), EPSILON
         ],
         [
-
+            T_ID(TokenType.SYMBOL, ";"), T_ID(TokenType.SYMBOL, "]"), T_ID(TokenType.SYMBOL, ")"),
+            T_ID(TokenType.SYMBOL, ",")
         ]
     ),
     NT.RELOP: NTerminalInfo(
@@ -271,7 +313,7 @@ N_TERMINALS_INFO: dict[NT, NTerminalInfo] = {
             T_ID(TokenType.SYMBOL, "<"), T_ID(TokenType.SYMBOL, "==")
         ],
         [
-
+            TokenType.ID, TokenType.NUM, T_ID(TokenType.SYMBOL, "(")
         ]
     ),
     NT.ADDITIVE_EXPRESSION: NTerminalInfo(
@@ -279,7 +321,8 @@ N_TERMINALS_INFO: dict[NT, NTerminalInfo] = {
             TokenType.ID, TokenType.NUM, T_ID(TokenType.SYMBOL, "(")
         ],
         [
-
+            T_ID(TokenType.SYMBOL, ";"), T_ID(TokenType.SYMBOL, "]"), T_ID(TokenType.SYMBOL, ")"),
+            T_ID(TokenType.SYMBOL, ",")
         ]
     ),
     NT.ADDITIVE_EXPRESSION_PRIME: NTerminalInfo(
@@ -288,7 +331,8 @@ N_TERMINALS_INFO: dict[NT, NTerminalInfo] = {
             T_ID(TokenType.SYMBOL, "-"), T_ID(TokenType.SYMBOL, "*"), EPSILON
         ],
         [
-
+            T_ID(TokenType.SYMBOL, ";"), T_ID(TokenType.SYMBOL, "]"), T_ID(TokenType.SYMBOL, ")"),
+            T_ID(TokenType.SYMBOL, ","), T_ID(TokenType.SYMBOL, "<"), T_ID(TokenType.SYMBOL, "==")
         ]
     ),
     NT.ADDITIVE_EXPRESSION_ZEGOND: NTerminalInfo(
@@ -296,7 +340,8 @@ N_TERMINALS_INFO: dict[NT, NTerminalInfo] = {
             TokenType.NUM, T_ID(TokenType.SYMBOL, "(")
         ],
         [
-
+            T_ID(TokenType.SYMBOL, ";"), T_ID(TokenType.SYMBOL, "]"), T_ID(TokenType.SYMBOL, ")"),
+            T_ID(TokenType.SYMBOL, ","), T_ID(TokenType.SYMBOL, "<"), T_ID(TokenType.SYMBOL, "==")
         ]
     ),
     NT.D: NTerminalInfo(
@@ -304,7 +349,8 @@ N_TERMINALS_INFO: dict[NT, NTerminalInfo] = {
             T_ID(TokenType.SYMBOL, "+"), T_ID(TokenType.SYMBOL, "-"), EPSILON
         ],
         [
-
+            T_ID(TokenType.SYMBOL, ";"), T_ID(TokenType.SYMBOL, "]"), T_ID(TokenType.SYMBOL, ")"),
+            T_ID(TokenType.SYMBOL, ","), T_ID(TokenType.SYMBOL, "<"), T_ID(TokenType.SYMBOL, "==")
         ]
     ),
     NT.ADDOP: NTerminalInfo(
@@ -312,7 +358,7 @@ N_TERMINALS_INFO: dict[NT, NTerminalInfo] = {
             T_ID(TokenType.SYMBOL, "+"), T_ID(TokenType.SYMBOL, "-")
         ],
         [
-
+            TokenType.ID, TokenType.NUM, T_ID(TokenType.SYMBOL, "(")
         ]
     ),
     NT.TERM: NTerminalInfo(
@@ -320,7 +366,9 @@ N_TERMINALS_INFO: dict[NT, NTerminalInfo] = {
             TokenType.ID, TokenType.NUM, T_ID(TokenType.SYMBOL, "(")
         ],
         [
-
+            T_ID(TokenType.SYMBOL, ";"), T_ID(TokenType.SYMBOL, "]"), T_ID(TokenType.SYMBOL, ")"),
+            T_ID(TokenType.SYMBOL, ","), T_ID(TokenType.SYMBOL, "<"), T_ID(TokenType.SYMBOL, "=="),
+            T_ID(TokenType.SYMBOL, "+"), T_ID(TokenType.SYMBOL, "-")
         ]
     ),
     NT.TERM_PRIME: NTerminalInfo(
@@ -328,7 +376,9 @@ N_TERMINALS_INFO: dict[NT, NTerminalInfo] = {
             T_ID(TokenType.SYMBOL, "("), T_ID(TokenType.SYMBOL, "*"), EPSILON
         ],
         [
-
+            T_ID(TokenType.SYMBOL, ";"), T_ID(TokenType.SYMBOL, "]"), T_ID(TokenType.SYMBOL, ")"),
+            T_ID(TokenType.SYMBOL, ","), T_ID(TokenType.SYMBOL, "<"), T_ID(TokenType.SYMBOL, "=="),
+            T_ID(TokenType.SYMBOL, "+"), T_ID(TokenType.SYMBOL, "-")
         ]
     ),
     NT.TERM_ZEGOND: NTerminalInfo(
@@ -336,7 +386,9 @@ N_TERMINALS_INFO: dict[NT, NTerminalInfo] = {
             TokenType.NUM, T_ID(TokenType.SYMBOL, "(")
         ],
         [
-
+            T_ID(TokenType.SYMBOL, ";"), T_ID(TokenType.SYMBOL, "]"), T_ID(TokenType.SYMBOL, ")"),
+            T_ID(TokenType.SYMBOL, ","), T_ID(TokenType.SYMBOL, "<"), T_ID(TokenType.SYMBOL, "=="),
+            T_ID(TokenType.SYMBOL, "+"), T_ID(TokenType.SYMBOL, "-")
         ]
     ),
     NT.G: NTerminalInfo(
@@ -344,7 +396,9 @@ N_TERMINALS_INFO: dict[NT, NTerminalInfo] = {
             T_ID(TokenType.SYMBOL, "*"), EPSILON
         ],
         [
-
+            T_ID(TokenType.SYMBOL, ";"), T_ID(TokenType.SYMBOL, "]"), T_ID(TokenType.SYMBOL, ")"),
+            T_ID(TokenType.SYMBOL, ","), T_ID(TokenType.SYMBOL, "<"), T_ID(TokenType.SYMBOL, "=="),
+            T_ID(TokenType.SYMBOL, "+"), T_ID(TokenType.SYMBOL, "-")
         ]
     ),
     NT.FACTOR: NTerminalInfo(
@@ -352,7 +406,9 @@ N_TERMINALS_INFO: dict[NT, NTerminalInfo] = {
             TokenType.ID, TokenType.NUM, T_ID(TokenType.SYMBOL, "(")
         ],
         [
-
+            T_ID(TokenType.SYMBOL, ";"), T_ID(TokenType.SYMBOL, "]"), T_ID(TokenType.SYMBOL, ")"),
+            T_ID(TokenType.SYMBOL, ","), T_ID(TokenType.SYMBOL, "<"), T_ID(TokenType.SYMBOL, "=="),
+            T_ID(TokenType.SYMBOL, "+"), T_ID(TokenType.SYMBOL, "-"), T_ID(TokenType.SYMBOL, "*")
         ]
     ),
     NT.VAR_CALL_PRIME: NTerminalInfo(
@@ -360,7 +416,9 @@ N_TERMINALS_INFO: dict[NT, NTerminalInfo] = {
             T_ID(TokenType.SYMBOL, "["), T_ID(TokenType.SYMBOL, "("), EPSILON
         ],
         [
-
+            T_ID(TokenType.SYMBOL, ";"), T_ID(TokenType.SYMBOL, "]"), T_ID(TokenType.SYMBOL, ")"),
+            T_ID(TokenType.SYMBOL, ","), T_ID(TokenType.SYMBOL, "<"), T_ID(TokenType.SYMBOL, "=="),
+            T_ID(TokenType.SYMBOL, "+"), T_ID(TokenType.SYMBOL, "-"), T_ID(TokenType.SYMBOL, "*")
         ]
     ),
     NT.VAR_PRIME: NTerminalInfo(
@@ -368,7 +426,9 @@ N_TERMINALS_INFO: dict[NT, NTerminalInfo] = {
             T_ID(TokenType.SYMBOL, "["), EPSILON
         ],
         [
-
+            T_ID(TokenType.SYMBOL, ";"), T_ID(TokenType.SYMBOL, "]"), T_ID(TokenType.SYMBOL, ")"),
+            T_ID(TokenType.SYMBOL, ","), T_ID(TokenType.SYMBOL, "<"), T_ID(TokenType.SYMBOL, "=="),
+            T_ID(TokenType.SYMBOL, "+"), T_ID(TokenType.SYMBOL, "-"), T_ID(TokenType.SYMBOL, "*")
         ]
     ),
     NT.FACTOR_PRIME: NTerminalInfo(
@@ -376,7 +436,9 @@ N_TERMINALS_INFO: dict[NT, NTerminalInfo] = {
             T_ID(TokenType.SYMBOL, "("), EPSILON
         ],
         [
-
+            T_ID(TokenType.SYMBOL, ";"), T_ID(TokenType.SYMBOL, "]"), T_ID(TokenType.SYMBOL, ")"),
+            T_ID(TokenType.SYMBOL, ","), T_ID(TokenType.SYMBOL, "<"), T_ID(TokenType.SYMBOL, "=="),
+            T_ID(TokenType.SYMBOL, "+"), T_ID(TokenType.SYMBOL, "-"), T_ID(TokenType.SYMBOL, "*")
         ]
     ),
     NT.FACTOR_ZEGOND: NTerminalInfo(
@@ -384,7 +446,9 @@ N_TERMINALS_INFO: dict[NT, NTerminalInfo] = {
             TokenType.NUM, T_ID(TokenType.SYMBOL, "(")
         ],
         [
-
+            T_ID(TokenType.SYMBOL, ";"), T_ID(TokenType.SYMBOL, "]"), T_ID(TokenType.SYMBOL, ")"),
+            T_ID(TokenType.SYMBOL, ","), T_ID(TokenType.SYMBOL, "<"), T_ID(TokenType.SYMBOL, "=="),
+            T_ID(TokenType.SYMBOL, "+"), T_ID(TokenType.SYMBOL, "-"), T_ID(TokenType.SYMBOL, "*")
         ]
     ),
     NT.ARGS: NTerminalInfo(
@@ -392,7 +456,7 @@ N_TERMINALS_INFO: dict[NT, NTerminalInfo] = {
             TokenType.ID, TokenType.NUM, T_ID(TokenType.SYMBOL, "("), EPSILON
         ],
         [
-
+            T_ID(TokenType.SYMBOL, ")")
         ]
     ),
     NT.ARG_LIST: NTerminalInfo(
@@ -400,7 +464,7 @@ N_TERMINALS_INFO: dict[NT, NTerminalInfo] = {
             TokenType.ID, TokenType.NUM, T_ID(TokenType.SYMBOL, "(")
         ],
         [
-
+            T_ID(TokenType.SYMBOL, ")")
         ]
     ),
     NT.ARG_LIST_PRIME: NTerminalInfo(
@@ -408,9 +472,9 @@ N_TERMINALS_INFO: dict[NT, NTerminalInfo] = {
             T_ID(TokenType.SYMBOL, ","), EPSILON
         ],
         [
-
+            T_ID(TokenType.SYMBOL, ")")
         ]
-    ),
+    )
 }
 
 T_DIAGRAMS: dict[NT, list[list[Transition]]] = {
