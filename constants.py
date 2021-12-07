@@ -10,7 +10,365 @@ KEYWORDS = ['if', 'else', 'void', 'int', 'repeat', 'break', 'until', 'return', '
 EPSILON = "EPSILON"
 
 N_TERMINALS_INFO: dict[NT, NTerminalInfo] = {
-    NT.PROGRAM: NTerminalInfo([], [])
+    NT.PROGRAM: NTerminalInfo(
+        [
+
+        ],
+        [
+
+        ]),
+    NT.DECLARATION_LIST: NTerminalInfo(
+        [
+
+        ],
+        [
+
+        ]
+    ),
+    NT.DECLARATION: NTerminalInfo(
+        [
+
+        ],
+        [
+
+        ]
+    ),
+    NT.DECLARATION_INITIAL: NTerminalInfo(
+        [
+
+        ],
+        [
+
+        ]
+    ),
+    NT.DECLARATION_PRIME: NTerminalInfo(
+        [
+
+        ],
+        [
+
+        ]
+    ),
+    NT.VAR_DECLARATION_PRIME: NTerminalInfo(
+        [
+
+        ],
+        [
+
+        ]
+    ),
+    NT.FUN_DECLARATION_PRIME: NTerminalInfo(
+        [
+
+        ],
+        [
+
+        ]
+    ),
+    NT.TYPE_SPECIFIER: NTerminalInfo(
+        [
+
+        ],
+        [
+
+        ]
+    ),
+    NT.PARAMS: NTerminalInfo(
+        [
+
+        ],
+        [
+
+        ]
+    ),
+    NT.PARAM_LIST: NTerminalInfo(
+        [
+
+        ],
+        [
+
+        ]
+    ),
+    NT.PARAM: NTerminalInfo(
+        [
+
+        ],
+        [
+
+        ]
+    ),
+    NT.PARAM_PRIME: NTerminalInfo(
+        [
+
+        ],
+        [
+
+        ]
+    ),
+    NT.COMPOUND_STMT: NTerminalInfo(
+        [
+
+        ],
+        [
+
+        ]
+    ),
+    NT.STATEMENT_LIST: NTerminalInfo(
+        [
+
+        ],
+        [
+
+        ]
+    ),
+    NT.STATEMENT: NTerminalInfo(
+        [
+
+        ],
+        [
+
+        ]
+    ),
+    NT.EXPRESSION_STMT: NTerminalInfo(
+        [
+
+        ],
+        [
+
+        ]
+    ),
+    NT.SELECTION_STMT: NTerminalInfo(
+        [
+
+        ],
+        [
+
+        ]
+    ),
+    NT.ELSE_STMT: NTerminalInfo(
+        [
+
+        ],
+        [
+
+        ]
+    ),
+    NT.ITERATION_STMT: NTerminalInfo(
+        [
+
+        ],
+        [
+
+        ]
+    ),
+    NT.RETURN_STMT: NTerminalInfo(
+        [
+
+        ],
+        [
+
+        ]
+    ),
+    NT.RETURN_STMT_PRIME: NTerminalInfo(
+        [
+
+        ],
+        [
+
+        ]
+    ),
+    NT.EXPRESSION: NTerminalInfo(
+        [
+
+        ],
+        [
+
+        ]
+    ),
+    NT.B: NTerminalInfo(
+        [
+
+        ],
+        [
+
+        ]
+    ),
+    NT.H: NTerminalInfo(
+        [
+
+        ],
+        [
+
+        ]
+    ),
+    NT.SIMPLE_EXPRESSION_ZEGOND: NTerminalInfo(
+        [
+
+        ],
+        [
+
+        ]
+    ),
+    NT.SIMPLE_EXPRESSION_PRIME: NTerminalInfo(
+        [
+
+        ],
+        [
+
+        ]
+    ),
+    NT.C: NTerminalInfo(
+        [
+
+        ],
+        [
+
+        ]
+    ),
+    NT.RELOP: NTerminalInfo(
+        [
+
+        ],
+        [
+
+        ]
+    ),
+    NT.ADDITIVE_EXPRESSION: NTerminalInfo(
+        [
+
+        ],
+        [
+
+        ]
+    ),
+    NT.ADDITIVE_EXPRESSION_PRIME: NTerminalInfo(
+        [
+
+        ],
+        [
+
+        ]
+    ),
+    NT.ADDITIVE_EXPRESSION_ZEGOND: NTerminalInfo(
+        [
+
+        ],
+        [
+
+        ]
+    ),
+    NT.D: NTerminalInfo(
+        [
+
+        ],
+        [
+
+        ]
+    ),
+    NT.ADDOP: NTerminalInfo(
+        [
+
+        ],
+        [
+
+        ]
+    ),
+    NT.TERM: NTerminalInfo(
+        [
+
+        ],
+        [
+
+        ]
+    ),
+    NT.TERM_PRIME: NTerminalInfo(
+        [
+
+        ],
+        [
+
+        ]
+    ),
+    NT.TERM_ZEGOND: NTerminalInfo(
+        [
+
+        ],
+        [
+
+        ]
+    ),
+    NT.G: NTerminalInfo(
+        [
+
+        ],
+        [
+
+        ]
+    ),
+    NT.FACTOR: NTerminalInfo(
+        [
+
+        ],
+        [
+
+        ]
+    ),
+    NT.VAR_CALL_PRIME: NTerminalInfo(
+        [
+
+        ],
+        [
+
+        ]
+    ),
+    NT.VAR_PRIME: NTerminalInfo(
+        [
+
+        ],
+        [
+
+        ]
+    ),
+    NT.FACTOR_PRIME: NTerminalInfo(
+        [
+
+        ],
+        [
+
+        ]
+    ),
+    NT.FACTOR_ZEGOND: NTerminalInfo(
+        [
+
+        ],
+        [
+
+        ]
+    ),
+    NT.ARGS: NTerminalInfo(
+        [
+
+        ],
+        [
+
+        ]
+    ),
+    NT.ARG_LIST: NTerminalInfo(
+        [
+
+        ],
+        [
+
+        ]
+    ),
+    NT.ARG_LIST_PRIME: NTerminalInfo(
+        [
+
+        ],
+        [
+
+        ]
+    ),
 }
 
 T_DIAGRAMS: dict[NT, list[list[Transition]]] = {
@@ -227,3 +585,131 @@ T_DIAGRAMS: dict[NT, list[list[Transition]]] = {
         [Transition(3, NT.ARG_LIST_PRIME)],
     ]
 }
+
+# ITSELF
+# Program Declaration-list $
+# Declaration-list Declaration Declaration-list | EPSILON
+# Declaration Declaration-initial Declaration-prime
+# Declaration-initial Type-specifier ID
+# Declaration-prime Fun-declaration-prime | Var-declaration-prime
+# Var-declaration-prime ; | [ NUM ] ;
+# Fun-declaration-prime ( Params ) Compound-stmt
+# Type-specifier int | void
+# Params int ID Param-prime Param-list | void
+# Param-list , Param Param-list | EPSILON
+# Param Declaration-initial Param-prime
+# Param-prime [ ] | EPSILON
+# Compound-stmt { Declaration-list Statement-list }
+# Statement-list Statement Statement-list | EPSILON
+# Statement Expression-stmt | Compound-stmt | Selection-stmt | Iteration-stmt | Return-stmt
+# Expression-stmt Expression ; | break ; | ;
+# Selection-stmt if ( Expression ) Statement Else-stmt
+# Else-stmt endif | else Statement endif
+# Iteration-stmt repeat Statement until ( Expression )
+# Return-stmt return Return-stmt-prime
+# Return-stmt-prime ; | Expression ;
+# Expression Simple-expression-zegond | ID B
+# B = Expression | [ Expression ] H | Simple-expression-prime
+# H = Expression | G D C
+# Simple-expression-zegond Additive-expression-zegond C
+# Simple-expression-prime Additive-expression-prime C
+# C Relop Additive-expression | EPSILON
+# Relop < | ==
+# Additive-expression Term D
+# Additive-expression-prime Term-prime D
+# Additive-expression-zegond Term-zegond D
+# D Addop Term D | EPSILON
+# Addop + | -
+# Term Factor G
+# Term-prime Factor-prime G
+# Term-zegond Factor-zegond G
+# G * Factor G | EPSILON
+# Factor ( Expression ) | ID Var-call-prime | NUM
+# Var-call-prime ( Args ) | Var-prime
+# Var-prime [ Expression ] | EPSILON
+# Factor-prime ( Args ) | EPSILON
+# Factor-zegond ( Expression ) | NUM
+# Args Arg-list | EPSILON
+# Arg-list Expression Arg-list-prime
+# Arg-list-prime , Expression Arg-list-prime | EPSILON
+
+
+# WEBSITE COPY AND PASTE
+# Program⟶Declarationlist $
+# Declarationlist⟶Declaration Declarationlist
+# Declarationlist⟶
+# Declaration⟶Declarationinitial Declarationprime
+# Declarationinitial⟶Typespecifier ID
+# Declarationprime⟶Fundeclarationprime
+# Declarationprime⟶Vardeclarationprime
+# Vardeclarationprime⟶;
+# Vardeclarationprime⟶[ NUM ] ;
+# Fundeclarationprime⟶( Params ) Compoundstmt
+# Typespecifier⟶int
+# Typespecifier⟶void
+# Params⟶int ID Paramprime Paramlist
+# Params⟶void
+# Paramlist⟶, Param Paramlist
+# Paramlist⟶
+# Param⟶Declarationinitial Paramprime
+# Paramprime⟶[ ]
+# Paramprime⟶
+# Compoundstmt⟶{ Declarationlist Statementlist }
+# Statementlist⟶Statement Statementlist
+# Statementlist⟶
+# Statement⟶Expressionstmt
+# Statement⟶Compoundstmt
+# Statement⟶Selectionstmt
+# Statement⟶Iterationstmt
+# Statement⟶Returnstmt
+# Expressionstmt⟶Expression ;
+# Expressionstmt⟶break ;
+# Expressionstmt⟶;
+# Selectionstmt⟶if ( Expression ) Statement Elsestmt
+# Elsestmt⟶endif
+# Elsestmt⟶else Statement endif
+# Iterationstmt⟶repeat Statement until ( Expression )
+# Returnstmt⟶return Returnstmtprime
+# Returnstmtprime⟶;
+# Returnstmtprime⟶Expression ;
+# Expression⟶Simpleexpressionzegond
+# Expression⟶ID B
+# B⟶= Expression
+# B⟶[ Expression ] H
+# B⟶Simpleexpressionprime
+# H⟶= Expression
+# H⟶G D C
+# Simpleexpressionzegond⟶Additiveexpressionzegond C
+# Simpleexpressionprime⟶Additiveexpressionprime C
+# C⟶Relop Additiveexpression
+# C⟶
+# Relop⟶<
+# Relop⟶==
+# Additiveexpression⟶Term D
+# Additiveexpressionprime⟶Termprime D
+# Additiveexpressionzegond⟶Termzegond D
+# D⟶Addop Term D
+# D⟶
+# Addop⟶+
+# Addop⟶-
+# Term⟶Factor G
+# Termprime⟶Factorprime G
+# Termzegond⟶Factorzegond G
+# G⟶* Factor G
+# G⟶
+# Factor⟶( Expression )
+# Factor⟶ID Varcallprime
+# Factor⟶NUM
+# Varcallprime⟶( Args )
+# Varcallprime⟶Varprime
+# Varprime⟶[ Expression ]
+# Varprime⟶
+# Factorprime⟶( Args )
+# Factorprime⟶
+# Factorzegond⟶( Expression )
+# Factorzegond⟶NUM
+# Args⟶Arglist
+# Args⟶
+# Arglist⟶Expression Arglistprime
+# Arglistprime⟶, Expression Arglistprime
+# Arglistprime⟶
