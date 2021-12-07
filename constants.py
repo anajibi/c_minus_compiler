@@ -7,7 +7,7 @@ LEXICAL_ERRORS_FILE_NAME = "lexical_errors.txt"
 PARSE_TREE_FILE_NAME = "parse_tree.txt"
 SYNTAX_ERRORS_FILE_NAME = "syntax_errors.txt"
 KEYWORDS = ['if', 'else', 'void', 'int', 'repeat', 'break', 'until', 'return', 'endif']
-EPSILON = "EPSILON"
+EPSILON = "epsilon"
 
 N_TERMINALS_INFO: dict[NT, NTerminalInfo] = {
     NT.PROGRAM: NTerminalInfo(
@@ -535,6 +535,7 @@ T_DIAGRAMS: dict[NT, list[list[Transition]]] = {
         [Transition(1, T_ID(TokenType.SYMBOL, "{"))],
         [Transition(2, NT.DECLARATION_LIST)],
         [Transition(3, NT.STATEMENT_LIST)],
+        [Transition(4, T_ID(TokenType.SYMBOL, "}"))],
     ],
     NT.STATEMENT_LIST: [
         [Transition(1, NT.STATEMENT), Transition(2, EPSILON)],

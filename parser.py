@@ -4,17 +4,29 @@ from scanner import get_next_token
 from declarations import Nonterminal as NT, Token, State, Transition, TokenType, T_ID
 
 
-def match(identifier: Transition.identifier, curr_token: Token):
+def is_in_follow(identifier, curr_token):
+    return curr_token.type in N_TERMINALS_INFO[identifier].follow \
+           or T_ID(curr_token.type, curr_token.lexeme) in N_TERMINALS_INFO[identifier].follow
+
+
+def is_in_first(identifier, curr_token):
+    return curr_token.type in N_TERMINALS_INFO[identifier].first \
+           or T_ID(curr_token.type, curr_token.lexeme) in N_TERMINALS_INFO[identifier].first
+
+
+def match(identifier, curr_token: Token):
     if isinstance(identifier, TokenType):
         return curr_token.type == identifier
     elif isinstance(identifier, T_ID):
         return curr_token.type == identifier.type and curr_token.lexeme == identifier.lexeme
     elif identifier == EPSILON:
-        return curr_token.type in N_TERMINALS_INFO[identifier].follow \
-               or curr_token.lexeme in N_TERMINALS_INFO[identifier].follow
+        return True
     elif isinstance(identifier, NT):
-        return curr_token.type in N_TERMINALS_INFO[identifier].first \
-               or curr_token.lexeme in N_TERMINALS_INFO[identifier].first
+        cond = False
+        if EPSILON in N_TERMINALS_INFO[identifier].first:
+            cond = curr_token.type in N_TERMINALS_INFO[identifier].follow \
+                   or T_ID(curr_token.type, curr_token.lexeme) in N_TERMINALS_INFO[identifier].follow
+        return is_in_first(identifier, curr_token) or cond
     else:
         return False
 
@@ -53,10 +65,11 @@ def parse():
                     curr_state = State(identifier, 0)
                     head = Node(identifier.value, head)
                 else:
+                    Node(EPSILON, parent=head)
                     curr_state.state = transition.dest_state
             else:
                 while curr_token.type in N_TERMINALS_INFO[curr_state.nonterminal].follow \
                         or curr_token.lexeme in N_TERMINALS_INFO[curr_state.nonterminal].follow:
                     curr_token = get_next_token()
                 head = head.parent
-    print("Done")
+    return head

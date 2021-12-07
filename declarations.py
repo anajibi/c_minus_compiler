@@ -74,6 +74,8 @@ class Token:
         self.line_num = line_num
 
     def __str__(self):
+        if self.lexeme == "$":
+            return self.lexeme
         return f"({self.type.value}, {self.lexeme})"
 
 

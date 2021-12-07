@@ -54,7 +54,7 @@ def get_next_token():
     elif is_letter(buffer[0]):  # For Keywords & IDs
         append_to_current_lexeme()
         read_keyword_or_id()
-        if current_lexeme in dict(list(symbol_table.items())[:8]):
+        if current_lexeme in KEYWORDS:
             read_token = Token(TokenType.KEYWORD, current_lexeme, line_number)
         else:
             if current_lexeme:
