@@ -15,14 +15,18 @@ N_TERMINALS_INFO: dict[NT, NTerminalInfo] = {
             T_ID(TokenType.EOF, "$"), T_ID(TokenType.KEYWORD, "int"), T_ID(TokenType.KEYWORD, "void")  # Todo: Sure?
         ],
         [
-
+            T_ID(TokenType.EOF, "$")
         ]),
     NT.DECLARATION_LIST: NTerminalInfo(
         [
             T_ID(TokenType.KEYWORD, "int"), T_ID(TokenType.KEYWORD, "void"), EPSILON
         ],
         [
-
+            T_ID(TokenType.EOF, "$"), TokenType.ID, T_ID(TokenType.SYMBOL, ";"), TokenType.NUM,
+            T_ID(TokenType.SYMBOL, "("),
+            T_ID(TokenType.SYMBOL, "{"), T_ID(TokenType.SYMBOL, "}"), T_ID(TokenType.KEYWORD, "break"),
+            T_ID(TokenType.KEYWORD, "if"),
+            T_ID(TokenType.KEYWORD, "repeat"), T_ID(TokenType.KEYWORD, "return")
         ]
     ),
     NT.DECLARATION: NTerminalInfo(
@@ -30,7 +34,12 @@ N_TERMINALS_INFO: dict[NT, NTerminalInfo] = {
             T_ID(TokenType.KEYWORD, "int"), T_ID(TokenType.KEYWORD, "void")
         ],
         [
-
+            T_ID(TokenType.EOF, "$"), TokenType.ID, T_ID(TokenType.SYMBOL, ";"), TokenType.NUM,
+            T_ID(TokenType.SYMBOL, "("),
+            T_ID(TokenType.SYMBOL, "{"), T_ID(TokenType.SYMBOL, "}"), T_ID(TokenType.KEYWORD, "break"),
+            T_ID(TokenType.KEYWORD, "if"),
+            T_ID(TokenType.KEYWORD, "repeat"), T_ID(TokenType.KEYWORD, "return"),
+            T_ID(TokenType.KEYWORD, "int"), T_ID(TokenType.KEYWORD, "void")
         ]
     ),
     NT.DECLARATION_INITIAL: NTerminalInfo(
@@ -38,7 +47,8 @@ N_TERMINALS_INFO: dict[NT, NTerminalInfo] = {
             T_ID(TokenType.KEYWORD, "int"), T_ID(TokenType.KEYWORD, "void")
         ],
         [
-
+            T_ID(TokenType.SYMBOL, ";"), T_ID(TokenType.SYMBOL, "["), T_ID(TokenType.SYMBOL, "("),
+            T_ID(TokenType.SYMBOL, ")"), T_ID(TokenType.SYMBOL, ",")
         ]
     ),
     NT.DECLARATION_PRIME: NTerminalInfo(
@@ -46,7 +56,12 @@ N_TERMINALS_INFO: dict[NT, NTerminalInfo] = {
             T_ID(TokenType.SYMBOL, ";"), T_ID(TokenType.SYMBOL, "["), T_ID(TokenType.SYMBOL, "(")
         ],
         [
-
+            T_ID(TokenType.EOF, "$"), TokenType.ID, T_ID(TokenType.SYMBOL, ";"), TokenType.NUM,
+            T_ID(TokenType.SYMBOL, "("),
+            T_ID(TokenType.SYMBOL, "{"), T_ID(TokenType.SYMBOL, "}"), T_ID(TokenType.KEYWORD, "break"),
+            T_ID(TokenType.KEYWORD, "if"),
+            T_ID(TokenType.KEYWORD, "repeat"), T_ID(TokenType.KEYWORD, "return"),
+            T_ID(TokenType.KEYWORD, "int"), T_ID(TokenType.KEYWORD, "void")
         ]
     ),
     NT.VAR_DECLARATION_PRIME: NTerminalInfo(
@@ -54,7 +69,12 @@ N_TERMINALS_INFO: dict[NT, NTerminalInfo] = {
             T_ID(TokenType.SYMBOL, ";"), T_ID(TokenType.SYMBOL, "[")
         ],
         [
-
+            T_ID(TokenType.EOF, "$"), TokenType.ID, T_ID(TokenType.SYMBOL, ";"), TokenType.NUM,
+            T_ID(TokenType.SYMBOL, "("),
+            T_ID(TokenType.SYMBOL, "{"), T_ID(TokenType.SYMBOL, "}"), T_ID(TokenType.KEYWORD, "break"),
+            T_ID(TokenType.KEYWORD, "if"),
+            T_ID(TokenType.KEYWORD, "repeat"), T_ID(TokenType.KEYWORD, "return"),
+            T_ID(TokenType.KEYWORD, "int"), T_ID(TokenType.KEYWORD, "void")
         ]
     ),
     NT.FUN_DECLARATION_PRIME: NTerminalInfo(
@@ -62,7 +82,12 @@ N_TERMINALS_INFO: dict[NT, NTerminalInfo] = {
             T_ID(TokenType.SYMBOL, "(")
         ],
         [
-
+            T_ID(TokenType.EOF, "$"), TokenType.ID, T_ID(TokenType.SYMBOL, ";"), TokenType.NUM,
+            T_ID(TokenType.SYMBOL, "("),
+            T_ID(TokenType.SYMBOL, "{"), T_ID(TokenType.SYMBOL, "}"), T_ID(TokenType.KEYWORD, "break"),
+            T_ID(TokenType.KEYWORD, "if"),
+            T_ID(TokenType.KEYWORD, "repeat"), T_ID(TokenType.KEYWORD, "return"),
+            T_ID(TokenType.KEYWORD, "int"), T_ID(TokenType.KEYWORD, "void")
         ]
     ),
     NT.TYPE_SPECIFIER: NTerminalInfo(
@@ -70,7 +95,7 @@ N_TERMINALS_INFO: dict[NT, NTerminalInfo] = {
             T_ID(TokenType.KEYWORD, "int"), T_ID(TokenType.KEYWORD, "void")
         ],
         [
-
+            TokenType.ID
         ]
     ),
     NT.PARAMS: NTerminalInfo(
@@ -78,7 +103,7 @@ N_TERMINALS_INFO: dict[NT, NTerminalInfo] = {
             T_ID(TokenType.KEYWORD, "int"), T_ID(TokenType.KEYWORD, "void")
         ],
         [
-
+            T_ID(TokenType.SYMBOL, ")")
         ]
     ),
     NT.PARAM_LIST: NTerminalInfo(
@@ -86,7 +111,7 @@ N_TERMINALS_INFO: dict[NT, NTerminalInfo] = {
             T_ID(TokenType.SYMBOL, ","), EPSILON
         ],
         [
-
+            T_ID(TokenType.SYMBOL, ")")
         ]
     ),
     NT.PARAM: NTerminalInfo(
@@ -94,7 +119,7 @@ N_TERMINALS_INFO: dict[NT, NTerminalInfo] = {
             T_ID(TokenType.KEYWORD, "int"), T_ID(TokenType.KEYWORD, "void")
         ],
         [
-
+            T_ID(TokenType.SYMBOL, ")"), T_ID(TokenType.SYMBOL, ",")
         ]
     ),
     NT.PARAM_PRIME: NTerminalInfo(
@@ -102,7 +127,7 @@ N_TERMINALS_INFO: dict[NT, NTerminalInfo] = {
             T_ID(TokenType.SYMBOL, "["), EPSILON
         ],
         [
-
+            T_ID(TokenType.SYMBOL, ")"), T_ID(TokenType.SYMBOL, ",")
         ]
     ),
     NT.COMPOUND_STMT: NTerminalInfo(
@@ -110,7 +135,12 @@ N_TERMINALS_INFO: dict[NT, NTerminalInfo] = {
             T_ID(TokenType.SYMBOL, "{")
         ],
         [
-
+            T_ID(TokenType.EOF, "$"), TokenType.ID, T_ID(TokenType.SYMBOL, ";"), TokenType.NUM,
+            T_ID(TokenType.SYMBOL, "("),
+            T_ID(TokenType.SYMBOL, "{"), T_ID(TokenType.SYMBOL, "}"), T_ID(TokenType.KEYWORD, "break"),
+            T_ID(TokenType.KEYWORD, "if"),
+            T_ID(TokenType.KEYWORD, "repeat"), T_ID(TokenType.KEYWORD, "return"),
+            T_ID(TokenType.KEYWORD, "int"), T_ID(TokenType.KEYWORD, "void")
         ]
     ),
     NT.STATEMENT_LIST: NTerminalInfo(
@@ -120,7 +150,7 @@ N_TERMINALS_INFO: dict[NT, NTerminalInfo] = {
             T_ID(TokenType.KEYWORD, "repeat"), T_ID(TokenType.KEYWORD, "return"), EPSILON
         ],
         [
-
+            T_ID(TokenType.SYMBOL, "}")
         ]
     ),
     NT.STATEMENT: NTerminalInfo(
