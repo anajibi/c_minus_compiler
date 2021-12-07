@@ -12,7 +12,7 @@ EPSILON = "EPSILON"
 N_TERMINALS_INFO: dict[NT, NTerminalInfo] = {
     NT.PROGRAM: NTerminalInfo(
         [
-            "$", T_ID(TokenType.KEYWORD, "int"), T_ID(TokenType.KEYWORD, "void")  # Todo: Sure?
+            T_ID(TokenType.EOF, "$"), T_ID(TokenType.KEYWORD, "int"), T_ID(TokenType.KEYWORD, "void")  # Todo: Sure?
         ],
         [
 
