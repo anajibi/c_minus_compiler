@@ -1,7 +1,7 @@
-from anytree import Node
-from constants import T_DIAGRAMS, N_TERMINALS_INFO, EPSILON
+from anytree import Node, RenderTree
+from constants import T_DIAGRAMS, N_TERMINALS_INFO, EPSILON, PARSE_TREE_FILE_NAME, SYNTAX_ERRORS_FILE_NAME
 from scanner import get_next_token
-from declarations import Nonterminal as NT, Token, State, Transition, TokenType, T_ID
+from declarations import Nonterminal as NT, Token, State, Transition, TokenType, T_ID, Syntax_Error
 
 
 def is_in_follow(identifier, curr_token):
@@ -38,7 +38,23 @@ def find_matching_transition(transitions, curr_token):
     return None
 
 
+def save_tree(head):
+    f = open(PARSE_TREE_FILE_NAME, "+w")
+    for pre, fill, node in RenderTree(head):
+        f.write("%s%s" % (pre, node.name))
+
+
+def save_syntax_errors(syntax_errors):
+    with open(SYNTAX_ERRORS_FILE_NAME, "+w") as f:
+        if len(syntax_errors) == 0:
+            f.write("There is no syntax error.")
+        else:
+            for error in syntax_errors:
+                f.write(error)
+
+
 def parse():
+    syntax_errors: list[Syntax_Error] = []
     accepted = False
     head = Node(NT.PROGRAM.value)
     stack = []
@@ -72,4 +88,6 @@ def parse():
                         or curr_token.lexeme in N_TERMINALS_INFO[curr_state.nonterminal].follow:
                     curr_token = get_next_token()
                 head = head.parent
+    save_tree(head)
+    save_syntax_errors(syntax_errors)
     return head
