@@ -597,9 +597,10 @@ T_DIAGRAMS: dict[NT, list[list[Transition]]] = {
         [Transition(5, NT.H)],
     ],
     NT.H: [
-        [Transition(1, NT.G), Transition(3, NT.EXPRESSION)],
+        [Transition(1, NT.G), Transition(3, T_ID(TokenType.SYMBOL, "="))],
         [Transition(2, NT.D)],
-        [Transition(3, NT.C)],
+        [Transition(4, NT.C)],
+        [Transition(4, NT.EXPRESSION)]
     ],
     NT.SIMPLE_EXPRESSION_ZEGOND: [
         [Transition(1, NT.ADDITIVE_EXPRESSION_ZEGOND)],

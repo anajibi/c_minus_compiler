@@ -39,18 +39,49 @@ def find_matching_transition(transitions, curr_token):
 
 
 def save_tree(head):
-    f = open(PARSE_TREE_FILE_NAME, "+w")
+    f = open(PARSE_TREE_FILE_NAME, "wb")
     for pre, fill, node in RenderTree(head):
-        f.write("%s%s" % (pre, node.name))
+        test = (pre + node.name + "\n").encode("UTF-8")
+        f.write(test)
+    f.close()
 
 
 def save_syntax_errors(syntax_errors):
-    with open(SYNTAX_ERRORS_FILE_NAME, "+w") as f:
-        if len(syntax_errors) == 0:
-            f.write("There is no syntax error.")
-        else:
-            for error in syntax_errors:
-                f.write(error)
+    f = open(SYNTAX_ERRORS_FILE_NAME, "+w")
+    if len(syntax_errors) == 0:
+        f.write("There is no syntax error.")
+    else:
+        for error in syntax_errors:
+            f.write(str(error) + "\n")
+    f.close()
+
+
+def all_terminals(state_transitions):
+    for transition in state_transitions:
+        if isinstance(transition.identifier, NT) or transition.identifier == EPSILON:
+            return False
+    return True
+
+
+def extract_token(identifier):
+    if isinstance(identifier, T_ID):
+        return identifier.lexeme
+    else:
+        return identifier.value
+
+
+def check_follows(nt_transitions, curr_token, syntax_errors):
+    for transition in nt_transitions:
+        if is_in_follow(transition.identifier, curr_token):
+            syntax_errors.append(
+                Syntax_Error(curr_token.line_num,
+                             f'missing {transition.identifier.value}'))
+            return transition.dest_state
+
+    syntax_errors.append(
+        Syntax_Error(curr_token.line_num,
+                     f'illegal {curr_token.type.value if curr_token.type == TokenType.NUM or curr_token.type == TokenType.ID else curr_token.lexeme}'))
+    return get_next_token()
 
 
 def parse():
@@ -60,6 +91,7 @@ def parse():
     stack = []
     curr_state = State(NT.PROGRAM, 0)
     curr_token = get_next_token()
+
     while not accepted:
         if len(T_DIAGRAMS[curr_state.nonterminal]) == curr_state.state:
             if len(stack) == 0:
@@ -84,10 +116,24 @@ def parse():
                     Node(EPSILON, parent=head)
                     curr_state.state = transition.dest_state
             else:
-                while curr_token.type in N_TERMINALS_INFO[curr_state.nonterminal].follow \
-                        or curr_token.lexeme in N_TERMINALS_INFO[curr_state.nonterminal].follow:
-                    curr_token = get_next_token()
-                head = head.parent
+                if curr_token.type == TokenType.EOF:
+                    syntax_errors.append(
+                        Syntax_Error(curr_token.line_num, f'Unexpected EOF'))
+                    while head.parent is not None:
+                        head = head.parent
+                    break
+                if all_terminals(state_transitions):
+                    syntax_errors.append(
+                        Syntax_Error(curr_token.line_num, f'missing {extract_token(state_transitions[0].identifier)}'))
+                    curr_state.state = state_transitions[0].dest_state
+                else:
+                    nt_transitions = filter(lambda tr: isinstance(tr.identifier, NT), state_transitions)
+                    token_or_state = check_follows(nt_transitions, curr_token, syntax_errors)
+                    if isinstance(token_or_state, Token):
+                        curr_token = token_or_state
+                    else:
+                        curr_state.state = token_or_state
+
     save_tree(head)
     save_syntax_errors(syntax_errors)
     return head

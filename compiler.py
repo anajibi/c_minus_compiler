@@ -32,6 +32,4 @@ def main():
 
 
 if __name__ == '__main__':
-    head = parse()
-    for pre, fill, node in RenderTree(head):
-        print("%s%s" % (pre, node.name))
+    parse()
