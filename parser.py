@@ -58,7 +58,7 @@ def save_syntax_errors(syntax_errors):
 
 def all_terminals(state_transitions):
     for transition in state_transitions:
-        if isinstance(transition.identifier, NT) or transition.identifier == EPSILON:
+        if (isinstance(transition.identifier, NT) or transition.identifier == EPSILON) or (isinstance(transition.identifier, T_ID) and transition.identifier.type == TokenType.EOF):
             return False
     return True
 
