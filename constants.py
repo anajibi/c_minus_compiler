@@ -493,6 +493,7 @@ T_DIAGRAMS: dict[NT, list[list[Transition]]] = {
     NT.DECLARATION_INITIAL: [
         [Transition(1, NT.TYPE_SPECIFIER)],
         [Transition(2, TokenType.ID)],
+        [Transition(3, ActionSymbol.pid)]
     ],
     NT.DECLARATION_PRIME: [
         [Transition(1, NT.FUN_DECLARATION_PRIME), Transition(1, NT.VAR_DECLARATION_PRIME)],
