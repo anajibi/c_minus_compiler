@@ -2,7 +2,7 @@ Program⟶Declarationlist $
 Declarationlist⟶Declaration Declarationlist
 Declarationlist⟶
 Declaration⟶Declarationinitial Declarationprime
-Declarationinitial⟶Typespecifier ID #ptoken
+Declarationinitial⟶Typespecifier ID #pid
 Declarationprime⟶Fundeclarationprime
 Declarationprime⟶Vardeclarationprime
 Vardeclarationprime⟶; #stvar
@@ -10,7 +10,7 @@ Vardeclarationprime⟶[ NUM #ptoken ] #starr;
 Fundeclarationprime⟶( Params ) #stfunc Compoundstmt #set_scope
 Typespecifier⟶int #ptoken
 Typespecifier⟶void #ptoken
-Params⟶int #ptoken ID #ptoken Paramprime Paramlist
+Params⟶int #ptoken ID #pid Paramprime Paramlist
 Params⟶void #param_void
 Paramlist⟶, Param Paramlist
 Paramlist⟶ #idicate_end_of_param
@@ -34,44 +34,44 @@ Elsestmt⟶else Statement endif
 Iterationstmt⟶repeat #save_i Statement until ( Expression ) #jpf_save
 Returnstmt⟶return Returnstmtprime
 Returnstmtprime⟶;
-Returnstmtprime⟶Expression ;
+Returnstmtprime⟶Expression ; #return_result
 Expression⟶Simpleexpressionzegond
-Expression⟶ID B
-B⟶= Expression
-B⟶[ Expression ] H
+Expression⟶ID #pid B
+B⟶= Expression #assign
+B⟶[ Expression ] #determine_arr H
 B⟶Simpleexpressionprime
-H⟶= Expression
+H⟶= Expression #assign_arr
 H⟶G D C
 Simpleexpressionzegond⟶Additiveexpressionzegond C
 Simpleexpressionprime⟶Additiveexpressionprime C
-C⟶Relop Additiveexpression
+C⟶Relop Additiveexpression #compare
 C⟶
-Relop⟶<
-Relop⟶==
+Relop⟶< #ptoken
+Relop⟶== #ptoken
 Additiveexpression⟶Term D
 Additiveexpressionprime⟶Termprime D
 Additiveexpressionzegond⟶Termzegond D
-D⟶Addop Term D
+D⟶Addop Term #addop D
 D⟶
-Addop⟶+
-Addop⟶-
+Addop⟶+ #ptoken
+Addop⟶- #ptoken
 Term⟶Factor G
 Termprime⟶Factorprime G
 Termzegond⟶Factorzegond G
-G⟶* Factor G
+G⟶* Factor #mult G
 G⟶
 Factor⟶( Expression )
-Factor⟶ID Varcallprime
-Factor⟶NUM
-Varcallprime⟶( Args )
+Factor⟶ID #pid Varcallprime
+Factor⟶NUM #ptoken
+Varcallprime⟶( #start_args Args ) #call_func
 Varcallprime⟶Varprime
-Varprime⟶[ Expression ]
+Varprime⟶[ Expression ] #determine_arr
 Varprime⟶
-Factorprime⟶( Args )
+Factorprime⟶(#start_args Args ) #call_func
 Factorprime⟶
 Factorzegond⟶( Expression )
-Factorzegond⟶NUM
-Args⟶Arglist
+Factorzegond⟶NUM #ptoken
+Args⟶ Arglist
 Args⟶
 Arglist⟶Expression Arglistprime
 Arglistprime⟶, Expression Arglistprime
