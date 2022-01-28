@@ -4,7 +4,8 @@ from typing import Union
 
 class ActionSymbol(Enum):
     ptoken = "ptoken",
-    pid = "pid"
+    pid = "pid",
+    pnum = "pnum"
 
 
 class Nonterminal(Enum):
