@@ -1,4 +1,4 @@
-from declarations import Nonterminal as NT, NTerminalInfo, Transition, TokenType, T_ID
+from declarations import Nonterminal as NT, NTerminalInfo, Transition, TokenType, T_ID,ActionSymbol
 
 INPUT_FILE_NAME = "input.txt"
 SYMBOL_TABLE_FILE_NAME = "symbol_table.txt"
@@ -493,6 +493,7 @@ T_DIAGRAMS: dict[NT, list[list[Transition]]] = {
     NT.DECLARATION_INITIAL: [
         [Transition(1, NT.TYPE_SPECIFIER)],
         [Transition(2, TokenType.ID)],
+        [Transition(3, ActionSymbol.ptoken)]
     ],
     NT.DECLARATION_PRIME: [
         [Transition(1, NT.FUN_DECLARATION_PRIME), Transition(1, NT.VAR_DECLARATION_PRIME)],

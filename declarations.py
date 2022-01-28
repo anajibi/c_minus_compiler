@@ -2,6 +2,10 @@ from enum import Enum
 from typing import Union
 
 
+class ActionSymbol(Enum):
+    ptoken = "ptoken"
+
+
 class Nonterminal(Enum):
     PROGRAM = "Program"
     DECLARATION_LIST = "Declaration-list"
@@ -102,7 +106,7 @@ class State:
 
 class Transition:
     dest_state: int
-    identifier: Union[str, Nonterminal, TokenType, T_ID]
+    identifier: Union[str, Nonterminal, TokenType, T_ID, ActionSymbol]
 
     def __init__(self, dest_state: int, identifier):
         self.dest_state = dest_state
