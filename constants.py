@@ -1,4 +1,6 @@
-from declarations import Nonterminal as NT, NTerminalInfo, Transition, TokenType, T_ID,ActionSymbol
+from typing import Dict, List
+
+from declarations import Nonterminal as NT, NTerminalInfo, Transition, TokenType, T_ID, ActionSymbol
 
 INPUT_FILE_NAME = "input.txt"
 SYMBOL_TABLE_FILE_NAME = "symbol_table.txt"
@@ -9,7 +11,7 @@ SYNTAX_ERRORS_FILE_NAME = "syntax_errors.txt"
 KEYWORDS = ['if', 'else', 'void', 'int', 'repeat', 'break', 'until', 'return', 'endif']
 EPSILON = "epsilon"
 
-N_TERMINALS_INFO: dict[NT, NTerminalInfo] = {
+N_TERMINALS_INFO: Dict[NT, NTerminalInfo] = {
     NT.PROGRAM: NTerminalInfo(
         [
             T_ID(TokenType.EOF, "$"), T_ID(TokenType.KEYWORD, "int"), T_ID(TokenType.KEYWORD, "void")  # Todo: Sure?
@@ -477,7 +479,7 @@ N_TERMINALS_INFO: dict[NT, NTerminalInfo] = {
     )
 }
 
-T_DIAGRAMS: dict[NT, list[list[Transition]]] = {
+T_DIAGRAMS: Dict[NT, List[List[Transition]]] = {
     NT.PROGRAM: [
         [Transition(1, NT.DECLARATION_LIST)],
         [Transition(2, T_ID(TokenType.EOF, "$"))],
@@ -500,27 +502,35 @@ T_DIAGRAMS: dict[NT, list[list[Transition]]] = {
     ],
     NT.VAR_DECLARATION_PRIME: [
         [Transition(1, T_ID(TokenType.SYMBOL, "[")), Transition(4, T_ID(TokenType.SYMBOL, ";"))],
-        [Transition(2, TokenType.NUM)],
-        [Transition(3, T_ID(TokenType.SYMBOL, "]"))],
-        [Transition(4, T_ID(TokenType.SYMBOL, ";"))],
+        [Transition(2, TokenType.NUM), Transition(2, ActionSymbol.stvar)],
+        [Transition(3, ActionSymbol.ptoken)],
+        [Transition(4, T_ID(TokenType.SYMBOL, "]"))],
+        [Transition(5, ActionSymbol.starr)],
+        [Transition(6, T_ID(TokenType.SYMBOL, ";"))],
     ],
     NT.FUN_DECLARATION_PRIME: [
         [Transition(1, T_ID(TokenType.SYMBOL, "("))],
         [Transition(2, NT.PARAMS)],
         [Transition(3, T_ID(TokenType.SYMBOL, ")"))],
-        [Transition(4, NT.COMPOUND_STMT)],
+        [Transition(4, ActionSymbol.stfunc)],
+        [Transition(5, NT.COMPOUND_STMT)],
+        [Transition(6, ActionSymbol.set_scope)],
     ],
     NT.TYPE_SPECIFIER: [
         [Transition(1, T_ID(TokenType.KEYWORD, "int")), Transition(1, T_ID(TokenType.KEYWORD, "void"))],
+        [Transition(2, ActionSymbol.ptoken)],  # Todo: Should be one right?
     ],
     NT.PARAMS: [
         [Transition(1, T_ID(TokenType.KEYWORD, "int")), Transition(4, T_ID(TokenType.KEYWORD, "void"))],
-        [Transition(2, TokenType.ID)],
-        [Transition(3, NT.PARAM_PRIME)],
-        [Transition(4, NT.PARAM_LIST)],
+        [Transition(2, ActionSymbol.ptoken), Transition(2, ActionSymbol.param_void)],
+        [Transition(3, TokenType.ID)],
+        [Transition(4, ActionSymbol.pid)],
+        [Transition(5, NT.PARAM_PRIME)],
+        [Transition(6, NT.PARAM_LIST)],
     ],
     NT.PARAM_LIST: [
-        [Transition(1, T_ID(TokenType.SYMBOL, ",")), Transition(3, EPSILON)],
+        [Transition(1, T_ID(TokenType.SYMBOL, ",")), Transition(3, ActionSymbol.indicate_program_end)],
+        # Todo: Should be instead of EPSILON right?
         [Transition(2, NT.PARAM)],
         [Transition(3, NT.PARAM_LIST)],
     ],
@@ -529,8 +539,9 @@ T_DIAGRAMS: dict[NT, list[list[Transition]]] = {
         [Transition(2, NT.PARAM_PRIME)],
     ],
     NT.PARAM_PRIME: [
-        [Transition(1, T_ID(TokenType.SYMBOL, "[")), Transition(2, EPSILON)],
+        [Transition(1, T_ID(TokenType.SYMBOL, "[")), Transition(2, ActionSymbol.st_param_var)],
         [Transition(2, T_ID(TokenType.SYMBOL, "]"))],
+        [Transition(3, ActionSymbol.st_param_arr)],
     ],
     NT.COMPOUND_STMT: [
         [Transition(1, T_ID(TokenType.SYMBOL, "{"))],
@@ -554,15 +565,19 @@ T_DIAGRAMS: dict[NT, list[list[Transition]]] = {
     NT.EXPRESSION_STMT: [
         [Transition(1, NT.EXPRESSION), Transition(1, T_ID(TokenType.KEYWORD, "break")),
          Transition(2, T_ID(TokenType.SYMBOL, ";"))],
-        [Transition(2, T_ID(TokenType.SYMBOL, ";"))]
+        [Transition(2, T_ID(TokenType.SYMBOL, ";"))],
+        [Transition(3, ActionSymbol.pop_exp), Transition(3, ActionSymbol.break_val)]
     ],
     NT.SELECTION_STMT: [
         [Transition(1, T_ID(TokenType.KEYWORD, "if"))],
         [Transition(2, T_ID(TokenType.SYMBOL, "("))],
         [Transition(3, NT.EXPRESSION)],
-        [Transition(4, T_ID(TokenType.SYMBOL, ")"))],
-        [Transition(5, NT.STATEMENT)],
-        [Transition(6, NT.ELSE_STMT)],
+        [Transition(4, ActionSymbol.save)],
+        [Transition(5, T_ID(TokenType.SYMBOL, ")"))],
+        [Transition(6, NT.STATEMENT)],
+        [Transition(7, ActionSymbol.jpf_save)],
+        [Transition(8, NT.ELSE_STMT)],
+        [Transition(9, ActionSymbol.jp)]
     ],
     NT.ELSE_STMT: [
         [Transition(1, T_ID(TokenType.KEYWORD, "else")), Transition(3, T_ID(TokenType.KEYWORD, "endif"))],
@@ -571,11 +586,13 @@ T_DIAGRAMS: dict[NT, list[list[Transition]]] = {
     ],
     NT.ITERATION_STMT: [
         [Transition(1, T_ID(TokenType.KEYWORD, "repeat"))],
-        [Transition(2, NT.STATEMENT)],
-        [Transition(3, T_ID(TokenType.KEYWORD, "until"))],
-        [Transition(4, T_ID(TokenType.SYMBOL, "("))],
-        [Transition(5, NT.EXPRESSION)],
-        [Transition(6, T_ID(TokenType.SYMBOL, ")"))],
+        [Transition(2, ActionSymbol.save_i)],
+        [Transition(3, NT.STATEMENT)],
+        [Transition(4, T_ID(TokenType.KEYWORD, "until"))],
+        [Transition(5, T_ID(TokenType.SYMBOL, "("))],
+        [Transition(6, NT.EXPRESSION)],
+        [Transition(7, T_ID(TokenType.SYMBOL, ")"))],
+        [Transition(8, ActionSymbol.jpf_save)]  # Todo: shouldn't be jp?
     ],
     NT.RETURN_STMT: [
         [Transition(1, T_ID(TokenType.KEYWORD, "return"))],
@@ -583,25 +600,30 @@ T_DIAGRAMS: dict[NT, list[list[Transition]]] = {
     ],
     NT.RETURN_STMT_PRIME: [
         [Transition(1, NT.EXPRESSION), Transition(2, T_ID(TokenType.SYMBOL, ";"))],
-        [Transition(2, T_ID(TokenType.SYMBOL, ";"))]
+        [Transition(2, T_ID(TokenType.SYMBOL, ";"))],
+        [Transition(3, ActionSymbol.return_result)]
     ],
     NT.EXPRESSION: [
         [Transition(1, TokenType.ID), Transition(2, NT.SIMPLE_EXPRESSION_ZEGOND)],
-        [Transition(2, NT.B)]
+        [Transition(2, ActionSymbol.pid)],  # Todo: Shouldn't have diff number and then B also?
+        [Transition(3, NT.B)]
     ],
     NT.B: [
         [Transition(1, T_ID(TokenType.SYMBOL, "=")), Transition(2, T_ID(TokenType.SYMBOL, "[")),
          Transition(5, NT.SIMPLE_EXPRESSION_PRIME)],
-        [Transition(5, NT.EXPRESSION)],
+        [Transition(6, NT.EXPRESSION)],
         [Transition(3, NT.EXPRESSION)],
         [Transition(4, T_ID(TokenType.SYMBOL, "]"))],
-        [Transition(5, NT.H)],
+        [Transition(5, ActionSymbol.determine_arr)],
+        [Transition(6, NT.H)],
+        [Transition(7, ActionSymbol.assign)]  # Todo: probably wrong number
     ],
     NT.H: [
         [Transition(1, NT.G), Transition(3, T_ID(TokenType.SYMBOL, "="))],
         [Transition(2, NT.D)],
         [Transition(4, NT.C)],
-        [Transition(4, NT.EXPRESSION)]
+        [Transition(5, NT.EXPRESSION)],
+        [Transition(6, ActionSymbol.assign_arr)]  # Todo: No idea about number
     ],
     NT.SIMPLE_EXPRESSION_ZEGOND: [
         [Transition(1, NT.ADDITIVE_EXPRESSION_ZEGOND)],
@@ -612,11 +634,13 @@ T_DIAGRAMS: dict[NT, list[list[Transition]]] = {
         [Transition(2, NT.C)]
     ],
     NT.C: [
-        [Transition(1, NT.RELOP), Transition(2, EPSILON)],
-        [Transition(2, NT.ADDITIVE_EXPRESSION)]
+        [Transition(1, NT.RELOP), Transition(3, EPSILON)],
+        [Transition(2, NT.ADDITIVE_EXPRESSION)],
+        [Transition(3, ActionSymbol.compare)]
     ],
     NT.RELOP: [
-        [Transition(1, T_ID(TokenType.SYMBOL, "<")), Transition(1, T_ID(TokenType.SYMBOL, "=="))]
+        [Transition(1, T_ID(TokenType.SYMBOL, "<")), Transition(1, T_ID(TokenType.SYMBOL, "=="))],
+        [Transition(2, ActionSymbol.ptoken)]
     ],
     NT.ADDITIVE_EXPRESSION: [
         [Transition(1, NT.TERM)],
@@ -631,12 +655,14 @@ T_DIAGRAMS: dict[NT, list[list[Transition]]] = {
         [Transition(2, NT.D)]
     ],
     NT.D: [
-        [Transition(1, NT.ADDOP), Transition(3, EPSILON)],
+        [Transition(1, NT.ADDOP), Transition(4, EPSILON)],
         [Transition(2, NT.TERM)],
-        [Transition(3, NT.D)],
+        [Transition(3, ActionSymbol.addop)],
+        [Transition(4, NT.D)],
     ],
     NT.ADDOP: [
-        [Transition(1, T_ID(TokenType.SYMBOL, "+")), Transition(1, T_ID(TokenType.SYMBOL, "-"))]
+        [Transition(1, T_ID(TokenType.SYMBOL, "+")), Transition(1, T_ID(TokenType.SYMBOL, "-"))],
+        [Transition(2, ActionSymbol.ptoken)]
     ],
     NT.TERM: [
         [Transition(1, NT.FACTOR)],
@@ -651,35 +677,44 @@ T_DIAGRAMS: dict[NT, list[list[Transition]]] = {
         [Transition(2, NT.G)]
     ],
     NT.G: [
-        [Transition(1, T_ID(TokenType.SYMBOL, "*")), Transition(3, EPSILON)],
+        [Transition(1, T_ID(TokenType.SYMBOL, "*")), Transition(4, EPSILON)],
         [Transition(2, NT.FACTOR)],
-        [Transition(3, NT.G)],
+        [Transition(3, ActionSymbol.mult)],
+        [Transition(4, NT.G)],
     ],
     NT.FACTOR: [
         [Transition(1, T_ID(TokenType.SYMBOL, "(")), Transition(3, TokenType.ID), Transition(4, TokenType.NUM)],
         [Transition(2, NT.EXPRESSION)],
-        [Transition(4, T_ID(TokenType.SYMBOL, ")"))],
-        [Transition(4, NT.VAR_CALL_PRIME)]
+        [Transition(6, T_ID(TokenType.SYMBOL, ")"))],
+        [Transition(5, ActionSymbol.pid)],
+        [Transition(6, ActionSymbol.ptoken)],
+        [Transition(6, NT.VAR_CALL_PRIME)]  # Todo: Correct?
     ],
     NT.VAR_CALL_PRIME: [
-        [Transition(1, T_ID(TokenType.SYMBOL, "(")), Transition(3, NT.VAR_PRIME)],
-        [Transition(2, NT.ARGS)],
-        [Transition(3, T_ID(TokenType.SYMBOL, ")"))]
+        [Transition(1, T_ID(TokenType.SYMBOL, "(")), Transition(5, NT.VAR_PRIME)],
+        [Transition(2, ActionSymbol.start_args)],
+        [Transition(3, NT.ARGS)],
+        [Transition(4, T_ID(TokenType.SYMBOL, ")"))],
+        [Transition(5, ActionSymbol.call_func)],
     ],
     NT.VAR_PRIME: [
-        [Transition(1, T_ID(TokenType.SYMBOL, "[")), Transition(3, EPSILON)],
+        [Transition(1, T_ID(TokenType.SYMBOL, "[")), Transition(4, EPSILON)],
         [Transition(2, NT.EXPRESSION)],
-        [Transition(3, T_ID(TokenType.SYMBOL, "]"))]
+        [Transition(3, T_ID(TokenType.SYMBOL, "]"))],
+        [Transition(4, ActionSymbol.determine_arr)]
     ],
     NT.FACTOR_PRIME: [
-        [Transition(1, T_ID(TokenType.SYMBOL, "(")), Transition(3, EPSILON)],
-        [Transition(2, NT.ARGS)],
-        [Transition(3, T_ID(TokenType.SYMBOL, ")"))]
+        [Transition(1, T_ID(TokenType.SYMBOL, "(")), Transition(5, EPSILON)],
+        [Transition(2, ActionSymbol.start_args)],
+        [Transition(3, NT.ARGS)],
+        [Transition(4, T_ID(TokenType.SYMBOL, ")"))],
+        [Transition(5, ActionSymbol.call_func)]
     ],
     NT.FACTOR_ZEGOND: [
         [Transition(1, T_ID(TokenType.SYMBOL, "(")), Transition(3, TokenType.NUM)],
         [Transition(2, NT.EXPRESSION)],
-        [Transition(3, T_ID(TokenType.SYMBOL, ")"))]
+        [Transition(4, T_ID(TokenType.SYMBOL, ")"))],
+        [Transition(4, ActionSymbol.ptoken)]
     ],
     NT.ARGS: [
         [Transition(1, NT.ARG_LIST), Transition(1, EPSILON)]

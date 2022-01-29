@@ -1,10 +1,33 @@
 from enum import Enum
-from typing import Union
+from typing import Union, List
 
 
 class ActionSymbol(Enum):
     ptoken = "ptoken",
-    pid = "pid"
+    pid = "pid",
+    starr = "starr",
+    stvar = "stvar",
+    stfunc = "stfunc",
+    set_scope = "set_scope",
+    param_void = "param_void",
+    indicate_program_end = "indicate_program_end",
+    st_param_var = "st_param_var",
+    st_param_arr = "st_param_arr",
+    pop_exp = "pop_exp",
+    breal_val = "break_val",
+    save = "save",
+    jpf_save = "jpf_save",
+    jp = "jp",
+    save_i = "save_i",
+    return_result = "return_result",
+    determine_arr = "determine_arr",
+    assign = "assign",
+    assign_arr = "assign_arr",
+    compare = "compare",
+    addop = "addop",
+    mult = "mult",
+    start_args = "start_args",
+    call_func = "call_func"
 
 
 class Nonterminal(Enum):
@@ -115,8 +138,8 @@ class Transition:
 
 
 class NTerminalInfo:
-    first: list[str]
-    follow: list[str]
+    first: List[str]
+    follow: List[str]
 
     def __init__(self, first, follow):
         self.first = first
