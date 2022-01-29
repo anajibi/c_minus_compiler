@@ -529,10 +529,11 @@ T_DIAGRAMS: Dict[NT, List[List[Transition]]] = {
         [Transition(6, NT.PARAM_LIST)],
     ],
     NT.PARAM_LIST: [
-        [Transition(1, T_ID(TokenType.SYMBOL, ",")), Transition(3, ActionSymbol.indicate_program_end)],
-        # Todo: Should be instead of EPSILON right?
+        [Transition(1, T_ID(TokenType.SYMBOL, ",")), Transition(3, EPSILON)],
+        # Todo: Should be instead of EPSILON right? NO This should be like this
         [Transition(2, NT.PARAM)],
-        [Transition(3, NT.PARAM_LIST)],
+        [Transition(4, NT.PARAM_LIST)],
+        [Transition(4, ActionSymbol.indicate_end_of_param)]
     ],
     NT.PARAM: [
         [Transition(1, NT.DECLARATION_INITIAL)],
@@ -592,7 +593,7 @@ T_DIAGRAMS: Dict[NT, List[List[Transition]]] = {
         [Transition(5, T_ID(TokenType.SYMBOL, "("))],
         [Transition(6, NT.EXPRESSION)],
         [Transition(7, T_ID(TokenType.SYMBOL, ")"))],
-        [Transition(8, ActionSymbol.jpf_save)]  # Todo: shouldn't be jp?
+        [Transition(8, ActionSymbol.jpf_i)]  # Todo: shouldn't be jp? should be jpf_i
     ],
     NT.RETURN_STMT: [
         [Transition(1, T_ID(TokenType.KEYWORD, "return"))],
@@ -604,26 +605,26 @@ T_DIAGRAMS: Dict[NT, List[List[Transition]]] = {
         [Transition(3, ActionSymbol.return_result)]
     ],
     NT.EXPRESSION: [
-        [Transition(1, TokenType.ID), Transition(2, NT.SIMPLE_EXPRESSION_ZEGOND)],
+        [Transition(1, TokenType.ID), Transition(3, NT.SIMPLE_EXPRESSION_ZEGOND)],
         [Transition(2, ActionSymbol.pid)],  # Todo: Shouldn't have diff number and then B also?
         [Transition(3, NT.B)]
     ],
     NT.B: [
         [Transition(1, T_ID(TokenType.SYMBOL, "=")), Transition(2, T_ID(TokenType.SYMBOL, "[")),
-         Transition(5, NT.SIMPLE_EXPRESSION_PRIME)],
+         Transition(7, NT.SIMPLE_EXPRESSION_PRIME)],
         [Transition(6, NT.EXPRESSION)],
         [Transition(3, NT.EXPRESSION)],
         [Transition(4, T_ID(TokenType.SYMBOL, "]"))],
         [Transition(5, ActionSymbol.determine_arr)],
-        [Transition(6, NT.H)],
+        [Transition(7, NT.H)],
         [Transition(7, ActionSymbol.assign)]  # Todo: probably wrong number
     ],
     NT.H: [
         [Transition(1, NT.G), Transition(3, T_ID(TokenType.SYMBOL, "="))],
         [Transition(2, NT.D)],
-        [Transition(4, NT.C)],
-        [Transition(5, NT.EXPRESSION)],
-        [Transition(6, ActionSymbol.assign_arr)]  # Todo: No idea about number
+        [Transition(5, NT.C)],
+        [Transition(4, NT.EXPRESSION)],
+        [Transition(5, ActionSymbol.assign)]  # Todo: No idea about number
     ],
     NT.SIMPLE_EXPRESSION_ZEGOND: [
         [Transition(1, NT.ADDITIVE_EXPRESSION_ZEGOND)],

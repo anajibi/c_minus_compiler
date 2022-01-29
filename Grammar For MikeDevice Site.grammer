@@ -40,7 +40,7 @@ Expression⟶ID #pid B
 B⟶= Expression #assign
 B⟶[ Expression ] #determine_arr H
 B⟶Simpleexpressionprime
-H⟶= Expression #assign_arr
+H⟶= Expression #assign
 H⟶G D C
 Simpleexpressionzegond⟶Additiveexpressionzegond C
 Simpleexpressionprime⟶Additiveexpressionprime C
