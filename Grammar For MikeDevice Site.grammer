@@ -33,10 +33,10 @@ Elsestmt⟶endif
 Elsestmt⟶else Statement endif
 Iterationstmt⟶repeat #save_i Statement until ( Expression ) #jpf_save_i
 Returnstmt⟶return Returnstmtprime
-Returnstmtprime⟶;
+Returnstmtprime⟶; #return_from_func
 Returnstmtprime⟶Expression ; #return_result
 Expression⟶Simpleexpressionzegond
-Expression⟶ID #pid B
+Expression⟶ID #determine_id B
 B⟶= Expression #assign
 B⟶[ Expression ] #determine_arr H
 B⟶Simpleexpressionprime
@@ -61,8 +61,8 @@ Termzegond⟶Factorzegond G
 G⟶* Factor #mult G
 G⟶
 Factor⟶( Expression )
-Factor⟶ID #pid Varcallprime
-Factor⟶NUM #ptoken
+Factor⟶ID #determine_id Varcallprime
+Factor⟶NUM #pnum
 Varcallprime⟶( #start_args Args ) #call_func
 Varcallprime⟶Varprime
 Varprime⟶[ Expression ] #determine_arr
@@ -70,7 +70,7 @@ Varprime⟶
 Factorprime⟶(#start_args Args ) #call_func
 Factorprime⟶
 Factorzegond⟶( Expression )
-Factorzegond⟶NUM #ptoken
+Factorzegond⟶NUM #pnum
 Args⟶ Arglist
 Args⟶
 Arglist⟶Expression Arglistprime

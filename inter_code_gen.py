@@ -280,14 +280,17 @@ class InterCodeGen:
     def jpf_save_i(self):
         pass
 
-    def return_result(self):
-        pass
-
     def assign(self):
         pass
 
     def determine_arr(self):
-        current_lexeme = self.stack.pop()
+        index = self.stack.pop()
+        array = self.stack.pop()
+        temp = self.get_temp()
+        self.stack.append(add([direct(array), index, temp]))
+
+    def pnum(self, current_token: Token):
+        self.stack.append(number(int(current_token.lexeme)))
 
     def compare(self):
         pass
@@ -302,27 +305,29 @@ class InterCodeGen:
         self.stack.append(START_ARGS_SYMBOL)
 
     def call_func(self):
-        func_name = self.stack.pop().lexeme
-        if self.ptr_table[func_name] == "output":
+        func_ptr = self.stack.pop()
+        if self.ptr_table[func_ptr] == "output":
             self.code.append(ThreeStateCode(TSCType.PRINT, self.stack.pop()))
         else:
-            local_vars_num = self.get_local_vars_num()
-            self.code += [add([TOP_SP, number(local_vars_num * BLOCK_SIZE), TOP_SP]),
-                          assign([number(0), indirect(TOP_SP)]),
-                          INCREMENT_TOP_SP]
-            i = len(self.code)
-            self.code += ["", ""]
-
+            self.code += push_to_stack(RETURN_ADDRESS)
             args = self.get_args()
-            for arg in args:
-                self.code += [assign([arg, indirect(TOP_SP)]), INCREMENT_TOP_SP]
-            self.code[i] = assign([number(len(self.code) + 1), indirect(TOP_SP)])
-            self.code[i + 1] = INCREMENT_TOP_SP
-            self.code.append(jp(func.ptr))
-            self.code.append(sub([TOP_SP, number(8 + len(args) * 4), TOP_SP]))
-            return_
-            self.code.append(assign([indirect(TOP_SP), return_var]))
-            self.stack.append(indirect(return_var))
+            self.save_and_copy_args(args, func_ptr)
+            self.code.append(assign([number(len(self.code) + 1), RETURN_ADDRESS]))
+            for param in reversed(self.function_info[func_ptr].params):
+                self.code += pop_from_stack(param)
+            self.code += pop_from_stack(RETURN_ADDRESS)
+            temp = self.get_temp()
+            self.code.append(assign([RETURN_VARIABLE, temp]))
+            self.stack.append(temp)
+
+    def return_result(self):
+        self.code.append(assign([self.stack.pop(), RETURN_VARIABLE]))
+        self.return_from_func()
+
+    def return_from_func(self):
+        for local_var in reversed(self.function_info[self.symbol_table[(self.current_scope_func, 0)].ptr].local_vars):
+            self.code += pop_from_stack(local_var)
+        self.code.append(jp(indirect(RETURN_ADDRESS)))
 
     @staticmethod
     def assign_type(attribute, type):
@@ -338,8 +343,31 @@ class InterCodeGen:
         # else:
         #     return self.symbol_table[(self.ptr_table[addr], 0)]
 
+    def determine_id(self, current_lexeme: Token):
+        id = current_lexeme.lexeme
+        variable = self.symbol_table[(id, self.scope)]
+        if variable.type == AttributeType.VAR or variable.type == AttributeType.LOCAL_VAR or variable.type == AttributeType.PAR_VAR:
+            self.stack.append(variable.ptr)
+        elif variable.type == AttributeType.FUNC:
+            self.stack.append(variable.ptr)
+        elif variable.type == AttributeType.ARR or variable.type == AttributeType.PAR_ARR or variable.type == AttributeType.LOCAL_ARR:
+            self.stack.append(indirect(variable.ptr))
+
     def delete_scope_one(self):
         pass
 
     def get_local_vars_num(self):
         pass
+
+    def get_args(self):
+        args = []
+        arg = self.stack.pop()
+        while arg != START_ARGS_SYMBOL:
+            args.append(arg)
+            arg = self.stack.pop()
+        return list(reversed(args))
+
+    def save_and_copy_args(self, args, func_ptr):
+        for arg, param in zip(args, self.function_info[func_ptr].params):
+            self.code += push_to_stack(param)
+            self.code.append(assign(arg, param))
