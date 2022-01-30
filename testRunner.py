@@ -5,7 +5,7 @@ from constants import PARSE_TREE_FILE_NAME, \
 
 
 def compare():
-    root_dir = "C:\\Users\\njibi\\Desktop\\P2_extra"
+    root_dir = r"C:\Users\njibi\Desktop\PA1_extra_samples"
     index = 1
     for subdir, dirs, files in os.walk(root_dir):
         for _dir in dirs:

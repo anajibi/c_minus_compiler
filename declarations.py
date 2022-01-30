@@ -4,7 +4,8 @@ from typing import Union, List
 
 class ActionSymbol(Enum):
     ptoken = "ptoken",
-    pid = "pid", # Todo: There was some pnum, wasn't anywhere else. What was it?
+    pid = "pid",  # Todo: There was some pnum, wasn't anywhere else. What was it?
+    pid_param = "pid_param",
     starr = "starr",
     stvar = "stvar",
     stfunc = "stfunc",
@@ -14,7 +15,7 @@ class ActionSymbol(Enum):
     st_param_var = "st_param_var",
     st_param_arr = "st_param_arr",
     pop_exp = "pop_exp",
-    breal_val = "break_val",
+    break_val = "break_val",
     save = "save",
     jpf_save = "jpf_save",
     jp = "jp",
@@ -28,6 +29,7 @@ class ActionSymbol(Enum):
     addop = "addop",
     mult = "mult",
     start_args = "start_args",
+    start_func = "start_func",
     call_func = "call_func"
 
 
