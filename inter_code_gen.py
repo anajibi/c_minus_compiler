@@ -243,6 +243,7 @@ class InterCodeGen:
         attribute.type = AttributeType.FUNC
         self.function_info[addr] = FunctionInfo(self.param_list)
         if self.ptr_table[addr] == "main":
+            global MAIN_STARTING_POINT
             MAIN_STARTING_POINT = addr
 
     def end_func(self):
@@ -274,11 +275,12 @@ class InterCodeGen:
     def save_i(self):
         self.stack.append(len(self.code))
 
+
     def jpf_save_i(self):
         pass
 
     def assign(self):
-        pass
+        self.code.append(assign([self.stack.pop(), self.stack.pop()]))
 
     def determine_arr(self):
         index = self.stack.pop()
@@ -290,7 +292,8 @@ class InterCodeGen:
         self.stack.append(number(int(current_token.lexeme)))
 
     def compare(self):
-        pass
+        temp = self.get_temp()
+
 
     def addop(self):
         pass
