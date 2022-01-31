@@ -1,4 +1,4 @@
-Program⟶Declarationlist $
+Program⟶Declarationlist #init_program $
 Declarationlist⟶Declaration Declarationlist
 Declarationlist⟶
 Declaration⟶Declarationinitial Declarationprime
@@ -10,14 +10,14 @@ Vardeclarationprime⟶[ NUM #ptoken ] #starr;
 Fundeclarationprime⟶#start_func( Params ) #stfunc Compoundstmt #end_func
 Typespecifier⟶int #ptoken
 Typespecifier⟶void #ptoken
-Params⟶int ID #pid_param Paramprime Paramlist
+Params⟶int ID #pid Paramprime Paramlist
 Params⟶void
 Paramlist⟶, Param Paramlist
 Paramlist⟶
 Param⟶Declarationinitial Paramprime
 Paramprime⟶[ ] #st_param_arr
 Paramprime⟶ #st_param_var
-Compoundstmt⟶{  Declarationlist #reset_top_sp Statementlist }
+Compoundstmt⟶{  Declarationlist Statementlist }
 Statementlist⟶Statement Statementlist
 Statementlist⟶
 Statement⟶Expressionstmt

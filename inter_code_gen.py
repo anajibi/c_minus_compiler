@@ -90,12 +90,11 @@ class ThreeStateCode:
 
 
 class Attribute:
-    ptr: int
+    ptr: int  # int i-> 400; int a[5] 400 -> 404, 408, ... 420; int a[] -> 400 -> 500
     scope: int
     out_type: AttributeOutType
     arg_cell_num: int
     type: AttributeType
-    top_sp: int
 
     def __init__(self, ptr, scope):
         self.ptr = ptr
@@ -103,17 +102,17 @@ class Attribute:
         self.out_type = None
         self.arg_cell_num = None
         self.type = None
-        self.func_starting_point = None
-        self.top_sp = TOP_SP
 
 
 class FunctionInfo:
-    params: List[int]
+    params: List[(int, Attribute)]
     local_vars: List[int]
+    temps: List[int]
 
     def __init__(self, params):
         self.params = params
         self.local_vars = []
+        self.temps = []
 
 
 class InterCodeGen:
@@ -124,9 +123,10 @@ class InterCodeGen:
     stack: List
     scope: int
     data_seg_ptr: int
-    param_list: List[int]
+    param_list: List[(int, Attribute)]
     current_scope_func: str
     local_var_list: List[int]
+    function_temps: List[int]
 
     def __init__(self):
         self.symbol_table = {}
@@ -138,6 +138,7 @@ class InterCodeGen:
         self.ptr_table = {}
         self.current_scope_func = "GLOBAL"
         self.function_info = {}
+        self.function_temps = []
 
     def initiate_code(self):
         self.code += [assign([number(0), PRINT_VARIABLE]), assign([number(0), RETURN_VARIABLE]),
@@ -149,6 +150,8 @@ class InterCodeGen:
     def get_temp(self, num_cells=1) -> number:
         temp = self.data_seg_ptr
         self.data_seg_ptr += BLOCK_SIZE * num_cells
+        if self.scope == 1:
+            self.function_info[self.symbol_table[(self.current_scope_func, 0)].ptr].temps.append(temp)
         return temp
 
     def pid(self, curr_token: Token):
@@ -161,14 +164,12 @@ class InterCodeGen:
         attr = Attribute(ptr=addr, scope=self.scope)
         self.symbol_table[(curr_token.lexeme, self.scope)] = attr
         self.ptr_table[addr] = curr_token.lexeme
+        attr = self.find_id(addr)
+        self.assign_type(attr, type)
         if self.scope == 0:
-            attr = self.find_id(addr)
-            self.assign_type(attr, type)
             attr.type = AttributeType.VAR
             self.code.append(assign([number(0), addr]))
         else:
-            attr = self.find_id(addr)
-            self.assign_type(attr, type)
             attr.type = AttributeType.LOCAL_VAR
             self.local_var_list.append(addr)
             self.code += push_to_stack(addr)
@@ -187,22 +188,17 @@ class InterCodeGen:
         attr.arg_cell_num = int(num_cells)
         if self.scope == 0:
             attr.type = AttributeType.ARR
-            self.code += push_to_stack(addr)
             self.code.append(assign([number(starting_point), addr]))
             for i in range(num_cells):
-                self.code.append(assign([number(0), addr + i * 4]))
+                self.code.append(assign([number(0), starting_point + i * 4]))
         else:
             attr.type = AttributeType.LOCAL_ARR
             self.local_var_list.append(addr)
-            self.code += push_to_stack(addr)
             self.code.append(assign([number(starting_point), addr]))
             for i in range(num_cells):
                 temp_addr = starting_point + i * 4
                 self.code += push_to_stack(temp_addr)
                 self.code += [assign([number(0), temp_addr])]
-
-    def pid_param(self, curr_token: Token):
-        self.stack.append(curr_token)
 
     def st_param_var(self):
         curr_token = self.stack.pop()
@@ -212,7 +208,7 @@ class InterCodeGen:
         self.ptr_table[temp] = curr_token.lexeme
         attr.out_type = AttributeOutType.INT
         attr.type = AttributeType.PAR_VAR
-        self.param_list.append(temp)
+        self.param_list.append((temp, attr))
 
     def st_param_arr(self):
         curr_token = self.stack.pop()
@@ -222,7 +218,7 @@ class InterCodeGen:
         self.ptr_table[temp] = curr_token.lexeme
         attr.out_type = AttributeOutType.INT
         attr.type = AttributeType.PAR_ARR
-        self.param_list.append(temp)
+        self.param_list.append((temp, attr))
 
     def ptoken(self, curr_token: Token):
         self.stack.append(curr_token)
@@ -235,7 +231,6 @@ class InterCodeGen:
         attr = Attribute(ptr=ptr, scope=self.scope)
         self.symbol_table[(curr_token.lexeme, self.scope)] = attr
         self.ptr_table[ptr] = curr_token.lexeme
-        attr.func_starting_point = ptr
         self.scope = 1
         self.assign_type(attr, type)
         self.stack.append(ptr)
@@ -247,8 +242,10 @@ class InterCodeGen:
         attribute.arg_cell_num = number_of_args
         attribute.type = AttributeType.FUNC
         self.function_info[addr] = FunctionInfo(self.param_list)
+        if self.ptr_table[addr] == "main":
+            MAIN_STARTING_POINT = addr
 
-    def set_scope(self):
+    def end_func(self):
         func_name = self.current_scope_func
         func = self.symbol_table[(func_name, 0)]
         self.function_info[func.ptr].local_vars = self.local_var_list
@@ -307,15 +304,18 @@ class InterCodeGen:
     def call_func(self):
         func_ptr = self.stack.pop()
         if self.ptr_table[func_ptr] == "output":
-            self.code.append(ThreeStateCode(TSCType.PRINT, self.stack.pop()))
+            self.code.append(assign([self.stack.pop(), PRINT_VARIABLE]))
+            self.code.append(ThreeStateCode(TSCType.PRINT, PRINT_VARIABLE))
         else:
             self.code += push_to_stack(RETURN_ADDRESS)
             args = self.get_args()
             self.save_and_copy_args(args, func_ptr)
+            self.push_temps(func_ptr)
             self.code.append(assign([number(len(self.code) + 1), RETURN_ADDRESS]))
             for param in reversed(self.function_info[func_ptr].params):
-                self.code += pop_from_stack(param)
+                self.code += pop_from_stack(param[0])
             self.code += pop_from_stack(RETURN_ADDRESS)
+            self.pop_temps(func_ptr)
             temp = self.get_temp()
             self.code.append(assign([RETURN_VARIABLE, temp]))
             self.stack.append(temp)
@@ -328,6 +328,10 @@ class InterCodeGen:
         for local_var in reversed(self.function_info[self.symbol_table[(self.current_scope_func, 0)].ptr].local_vars):
             self.code += pop_from_stack(local_var)
         self.code.append(jp(indirect(RETURN_ADDRESS)))
+
+    def init_program(self):
+        self.init_all_temps()
+        self.jump_to_main()
 
     @staticmethod
     def assign_type(attribute, type):
@@ -369,5 +373,27 @@ class InterCodeGen:
 
     def save_and_copy_args(self, args, func_ptr):
         for arg, param in zip(args, self.function_info[func_ptr].params):
+            # a function to check if param is array, then use direct(arg) instead of arg in two lines below
             self.code += push_to_stack(param)
-            self.code.append(assign(arg, param))
+            if param[1].type == AttributeType.PAR_VAR:
+                self.code.append(assign([direct(arg), param]))
+            else:
+                self.code.append(assign([arg, param]))
+
+    def push_temps(self, func_ptr):
+        for temp in self.function_info[func_ptr].temps:
+            self.code += push_to_stack(temp)
+
+    def pop_temps(self, func_ptr):
+        for temp in reversed(self.function_info[func_ptr].temps):
+            self.code += pop_from_stack(temp)
+
+    def init_all_temps(self):
+        self.stack.append(len(self.code))
+        self.code.append("")
+        for i in range(DATA_SEGMENT, self.data_seg_ptr, 4):
+            self.code.append(assign([number(0), i]))
+
+    def jump_to_main(self):
+        self.code.append(jp(MAIN_STARTING_POINT))
+        self.code[self.stack.pop()] = jp(len(self.code))
