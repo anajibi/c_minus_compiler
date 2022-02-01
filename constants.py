@@ -482,7 +482,7 @@ N_TERMINALS_INFO: Dict[NT, NTerminalInfo] = {
 T_DIAGRAMS: Dict[NT, List[List[Transition]]] = {
     NT.PROGRAM: [
         [Transition(1, NT.DECLARATION_LIST)],
-        [Transition(2, ActionSymbol.init)],
+        [Transition(2, ActionSymbol.init_program)],
         [Transition(3, T_ID(TokenType.EOF, "$"))],
     ],
     NT.DECLARATION_LIST: [

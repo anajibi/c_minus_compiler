@@ -1,7 +1,7 @@
 from enum import Enum
 from typing import Dict, List, Tuple, Union
 
-from declarations import Token
+from declarations import Token, ActionSymbol
 
 
 def assign(operands):
@@ -59,6 +59,7 @@ RETURN_ADDRESS = 812
 
 MAIN_STARTING_POINT = None
 START_ARGS_SYMBOL = "START_ARGS_SYMBOL"
+REPEAT_STARTING_POINT = "REPEAT_STARTING_POINT"
 
 
 def push_to_stack(addr):
@@ -121,7 +122,7 @@ class Attribute:
 
 
 class FunctionInfo:
-    params: List[(int, Attribute)]
+    params: List[Tuple[int, Attribute]]
     local_vars: List[int]
     temps: List[int]
 
@@ -139,7 +140,7 @@ class InterCodeGen:
     stack: List
     scope: int
     data_seg_ptr: int
-    param_list: List[(int, Attribute)]
+    param_list: List[Tuple[int, Attribute]]
     current_scope_func: str
     local_var_list: List[int]
     function_temps: List[int]
@@ -160,8 +161,67 @@ class InterCodeGen:
         self.code += [assign([number(0), PRINT_VARIABLE]), assign([number(0), RETURN_VARIABLE]),
                       assign([number(0), RETURN_ADDRESS]), assign([number(STACK_SEGMENT), TOP_SP]), ]
 
-    def generate(self, action, curr_token):
-        pass
+    def generate(self, action: ActionSymbol, curr_token):
+        if action == ActionSymbol.ptoken:
+            self.ptoken(curr_token)
+        elif action == ActionSymbol.pid:
+            self.pid(curr_token)
+        elif action == ActionSymbol.pid_param:
+            self.pid(curr_token)
+        elif action == ActionSymbol.starr:
+            self.starr()
+        elif action == ActionSymbol.stvar:
+            self.stvar()
+        elif action == ActionSymbol.stfunc:
+            self.stfunc()
+        elif action == ActionSymbol.st_param_arr:
+            self.st_param_arr()
+        elif action == ActionSymbol.st_param_var:
+            self.st_param_var()
+        elif action == ActionSymbol.pop_exp:
+            self.pop_exp()
+        elif action == ActionSymbol.break_val:
+            self.break_val()
+        elif action == ActionSymbol.save:
+            self.save()
+        elif action == ActionSymbol.jpf_save:
+            self.jpf_save()
+        elif action == ActionSymbol.jp:
+            self.jp()
+        elif action == ActionSymbol.jpf_save:
+            self.jpf_save()
+        elif action == ActionSymbol.save_i:
+            self.save_i()
+        elif action == ActionSymbol.determine_arr:
+            self.determine_arr()
+        elif action == ActionSymbol.return_result:
+            self.return_result()
+        elif action == ActionSymbol.assign:
+            self.assign()
+        elif action == ActionSymbol.compare:
+            self.compare()
+        elif action == ActionSymbol.addop:
+            self.addop()
+        elif action == ActionSymbol.mult:
+            self.mult()
+        elif action == ActionSymbol.start_args:
+            self.start_args()
+        elif action == ActionSymbol.start_func:
+            self.start_func(curr_token)
+        elif action == ActionSymbol.call_func:
+            self.call_func()
+        elif action == ActionSymbol.init_program:
+            self.init_program()
+        elif action == ActionSymbol.end_func:
+            self.end_func()
+        elif action == ActionSymbol.return_from_func:
+            self.return_from_func()
+        elif action == ActionSymbol.determine_id:
+            self.determine_id(curr_token)
+        elif action == ActionSymbol.pnum:
+            self.pnum(curr_token)
+        else:
+            raise Exception("Invalid action symbol")
 
     def get_temp(self, num_cells=1) -> number:
         temp = self.data_seg_ptr
@@ -279,10 +339,8 @@ class InterCodeGen:
         self.stack.pop()
 
     def break_val(self):
-        pass
-
-    def break_to(self):
-        pass
+        self.stack.append(len(self.code))
+        self.code.append("")
 
     def save(self):
         i = len(self.code)
@@ -306,13 +364,15 @@ class InterCodeGen:
         self.stack.pop()
 
     def save_i(self):
+        self.stack.append(REPEAT_STARTING_POINT)
         i = len(self.code)
         self.stack.append(i)
 
     def jpf_save_i(self):
-        self.code.append(jpf([self.stack[-1], self.code[-2]]))
-        self.stack.pop()
-        self.stack.pop()
+        self.code.append(jpf([self.stack.pop(), self.stack.pop()]))
+        top_sp = self.stack.pop()
+        while top_sp != REPEAT_STARTING_POINT:
+            self.code[top_sp] = jp(len(self.code))
 
     def assign(self):
         self.code.append(assign([self.stack.pop(), self.stack.pop()]))

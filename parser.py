@@ -2,6 +2,7 @@ from anytree import Node, RenderTree
 from constants import T_DIAGRAMS, N_TERMINALS_INFO, EPSILON, PARSE_TREE_FILE_NAME, SYNTAX_ERRORS_FILE_NAME
 from declarations import Nonterminal as NT, Token, State, TokenType, T_ID, Syntax_Error, ActionSymbol
 
+prev_token = None
 
 class Parser:
 
@@ -77,6 +78,7 @@ class Parser:
             return identifier.value
 
     def check_follows(self, nt_transitions, curr_token, syntax_errors):
+        global prev_token
         for transition in nt_transitions:
             if Parser.is_in_follow(transition.identifier, curr_token):
                 syntax_errors.append(
@@ -87,16 +89,17 @@ class Parser:
         syntax_errors.append(
             Syntax_Error(curr_token.line_num,
                          f'illegal {curr_token.type.value if curr_token.type == TokenType.NUM or curr_token.type == TokenType.ID else curr_token.lexeme}'))
+        prev_token = curr_token
         return self.scanner.get_next_token()
 
     def parse(self):
+        global prev_token
         syntax_errors: list[Syntax_Error] = []
         accepted = False
         head = Node(NT.PROGRAM.value)
         stack = []
         curr_state = State(NT.PROGRAM, 0)
         curr_token = self.scanner.get_next_token()
-
         while not accepted:
             if len(T_DIAGRAMS[curr_state.nonterminal]) == curr_state.state:
                 if len(stack) == 0:
@@ -107,7 +110,7 @@ class Parser:
             else:
                 state_transitions = T_DIAGRAMS[curr_state.nonterminal][curr_state.state]
                 if isinstance(state_transitions[0].identifier, ActionSymbol):
-                    self.inter_code_gen.generate(state_transitions[0].identifier, curr_token)
+                    self.inter_code_gen.generate(state_transitions[0].identifier, prev_token)
                     curr_state.state = state_transitions[0].dest_state
                     continue
                 transition = Parser.find_matching_transition(state_transitions, curr_token)
@@ -116,6 +119,7 @@ class Parser:
                     if isinstance(identifier, TokenType) or isinstance(identifier, T_ID):
                         curr_state.state = transition.dest_state
                         Node(str(curr_token), parent=head)
+                        prev_token = curr_token
                         curr_token = self.scanner.get_next_token()
                     elif isinstance(identifier, NT):
                         stack.append(State(curr_state.nonterminal, transition.dest_state))
