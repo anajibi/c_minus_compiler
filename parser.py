@@ -4,6 +4,7 @@ from declarations import Nonterminal as NT, Token, State, TokenType, T_ID, Synta
 
 prev_token = None
 
+
 class Parser:
 
     def __init__(self, scanner, inter_code_gen):
@@ -38,9 +39,12 @@ class Parser:
             return False
 
     @staticmethod
-    def find_matching_transition(transitions, curr_token):
+    def find_matching_transition(transitions, curr_token, curr_state_nt):
         for transition in transitions:
-            if Parser.match(transition.identifier, curr_token):
+            identifier = transition.identifier
+            if isinstance(identifier, ActionSymbol):
+                identifier = T_DIAGRAMS[curr_state_nt][transition.dest_state][0].identifier
+            if Parser.match(identifier, curr_token):
                 return transition
         return None
 
@@ -113,9 +117,14 @@ class Parser:
                     self.inter_code_gen.generate(state_transitions[0].identifier, prev_token)
                     curr_state.state = state_transitions[0].dest_state
                     continue
-                transition = Parser.find_matching_transition(state_transitions, curr_token)
+                transition = Parser.find_matching_transition(state_transitions, curr_token, curr_state.nonterminal)
+
                 if transition is not None:
                     identifier = transition.identifier
+                    if isinstance(identifier, ActionSymbol):
+                        self.inter_code_gen.generate(identifier, prev_token)
+                        curr_state.state = transition.dest_state
+                        continue
                     if isinstance(identifier, TokenType) or isinstance(identifier, T_ID):
                         curr_state.state = transition.dest_state
                         Node(str(curr_token), parent=head)

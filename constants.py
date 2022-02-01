@@ -496,19 +496,20 @@ T_DIAGRAMS: Dict[NT, List[List[Transition]]] = {
     NT.DECLARATION_INITIAL: [
         [Transition(1, NT.TYPE_SPECIFIER)],
         [Transition(2, TokenType.ID)],
-        [Transition(3, ActionSymbol.pid)]
     ],
     NT.DECLARATION_PRIME: [
         [Transition(2, NT.FUN_DECLARATION_PRIME), Transition(1, ActionSymbol.pid)],
         [Transition(2, NT.VAR_DECLARATION_PRIME)]
     ],
     NT.VAR_DECLARATION_PRIME: [
-        [Transition(1, T_ID(TokenType.SYMBOL, "[")), Transition(4, T_ID(TokenType.SYMBOL, ";"))],
-        [Transition(2, TokenType.NUM), Transition(2, ActionSymbol.stvar)],
+        [Transition(1, T_ID(TokenType.SYMBOL, "[")), Transition(6, ActionSymbol.stvar)],
+        [Transition(2, TokenType.NUM), ],
         [Transition(3, ActionSymbol.ptoken)],
         [Transition(4, T_ID(TokenType.SYMBOL, "]"))],
         [Transition(5, ActionSymbol.starr)],
-        [Transition(6, T_ID(TokenType.SYMBOL, ";"))],
+        [Transition(7, T_ID(TokenType.SYMBOL, ";"))],
+        [Transition(7, T_ID(TokenType.SYMBOL, ";"))],
+
     ],
     NT.FUN_DECLARATION_PRIME: [
         [Transition(1, ActionSymbol.start_func)],
