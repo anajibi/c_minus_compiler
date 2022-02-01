@@ -17,7 +17,7 @@ Paramlist⟶
 Param⟶Declarationinitial Paramprime
 Paramprime⟶[ ] #st_param_arr
 Paramprime⟶ #st_param_var
-Compoundstmt⟶{  Declarationlist Statementlist }
+Compoundstmt⟶{  Declarationlist Statementlist } #break_to
 Statementlist⟶Statement Statementlist
 Statementlist⟶
 Statement⟶Expressionstmt

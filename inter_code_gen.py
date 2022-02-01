@@ -277,6 +277,9 @@ class InterCodeGen:
     def break_val(self):
         pass
 
+    def break_to(self):
+        pass
+
     def save(self):
         i = len(self.code)
         self.code.append("")
