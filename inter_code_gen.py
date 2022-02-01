@@ -269,7 +269,11 @@ class InterCodeGen:
         self.param_list, self.local_var_list = [], []
         self.delete_scope_one()
         self.scope = 0
-        self.code[func.ptr - 1] = len(self.code)
+        if func_name == "main":
+            self.stack.append(len(self.code))
+            self.code.append("")
+        self.code[func.ptr - 1] = jp(len(self.code))
+        self.current_scope_func = None
 
     def pop_exp(self):
         self.stack.pop()
@@ -386,6 +390,8 @@ class InterCodeGen:
     def init_program(self):
         self.init_all_temps()
         self.jump_to_main()
+        var = self.stack.pop()
+        self.code[var] = jp(len(self.code))
 
     @staticmethod
     def assign_type(attribute, type):
