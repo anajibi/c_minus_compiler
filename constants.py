@@ -482,7 +482,8 @@ N_TERMINALS_INFO: Dict[NT, NTerminalInfo] = {
 T_DIAGRAMS: Dict[NT, List[List[Transition]]] = {
     NT.PROGRAM: [
         [Transition(1, NT.DECLARATION_LIST)],
-        [Transition(2, T_ID(TokenType.EOF, "$"))],
+        [Transition(2, ActionSymbol.init)],
+        [Transition(3, T_ID(TokenType.EOF, "$"))],
     ],
     NT.DECLARATION_LIST: [
         [Transition(1, NT.DECLARATION), Transition(2, EPSILON)],
@@ -498,7 +499,8 @@ T_DIAGRAMS: Dict[NT, List[List[Transition]]] = {
         [Transition(3, ActionSymbol.pid)]
     ],
     NT.DECLARATION_PRIME: [
-        [Transition(1, NT.FUN_DECLARATION_PRIME), Transition(1, NT.VAR_DECLARATION_PRIME)],
+        [Transition(2, NT.FUN_DECLARATION_PRIME), Transition(1, ActionSymbol.pid)],
+        [Transition(2, NT.VAR_DECLARATION_PRIME)]
     ],
     NT.VAR_DECLARATION_PRIME: [
         [Transition(1, T_ID(TokenType.SYMBOL, "[")), Transition(4, T_ID(TokenType.SYMBOL, ";"))],
@@ -515,33 +517,31 @@ T_DIAGRAMS: Dict[NT, List[List[Transition]]] = {
         [Transition(4, T_ID(TokenType.SYMBOL, ")"))],
         [Transition(5, ActionSymbol.stfunc)],
         [Transition(6, NT.COMPOUND_STMT)],
-        [Transition(7, ActionSymbol.set_scope)],
+        [Transition(7, ActionSymbol.end_func)],
     ],
     NT.TYPE_SPECIFIER: [
         [Transition(1, T_ID(TokenType.KEYWORD, "int")), Transition(1, T_ID(TokenType.KEYWORD, "void"))],
         [Transition(2, ActionSymbol.ptoken)],  # Todo: Should be one right?
     ],
     NT.PARAMS: [
-        [Transition(2, T_ID(TokenType.KEYWORD, "int")), Transition(1, T_ID(TokenType.KEYWORD, "void"))],
-        [Transition(6, ActionSymbol.param_void)],
-        [Transition(3, TokenType.ID)],
-        [Transition(4, ActionSymbol.pid_param)],
-        [Transition(5, NT.PARAM_PRIME)],
-        [Transition(6, NT.PARAM_LIST)],
+        [Transition(1, T_ID(TokenType.KEYWORD, "int")), Transition(5, T_ID(TokenType.KEYWORD, "void"))],
+        [Transition(2, TokenType.ID)],
+        [Transition(3, ActionSymbol.pid)],
+        [Transition(4, NT.PARAM_PRIME)],
+        [Transition(5, NT.PARAM_LIST)],
     ],
     NT.PARAM_LIST: [
         [Transition(1, T_ID(TokenType.SYMBOL, ",")), Transition(3, EPSILON)],
         # Todo: Should be instead of EPSILON right? NO This should be like this
         [Transition(2, NT.PARAM)],
-        [Transition(4, NT.PARAM_LIST)],
-        [Transition(4, ActionSymbol.indicate_end_of_param)]
+        [Transition(3, NT.PARAM_LIST)],
     ],
     NT.PARAM: [
         [Transition(1, NT.DECLARATION_INITIAL)],
         [Transition(2, NT.PARAM_PRIME)],
     ],
     NT.PARAM_PRIME: [
-        [Transition(1, T_ID(TokenType.SYMBOL, "[")), Transition(2, ActionSymbol.st_param_var)],
+        [Transition(1, T_ID(TokenType.SYMBOL, "[")), Transition(3, ActionSymbol.st_param_var)],
         [Transition(2, T_ID(TokenType.SYMBOL, "]"))],
         [Transition(3, ActionSymbol.st_param_arr)],
     ],
@@ -594,20 +594,21 @@ T_DIAGRAMS: Dict[NT, List[List[Transition]]] = {
         [Transition(5, T_ID(TokenType.SYMBOL, "("))],
         [Transition(6, NT.EXPRESSION)],
         [Transition(7, T_ID(TokenType.SYMBOL, ")"))],
-        [Transition(8, ActionSymbol.jpf_i)]  # Todo: shouldn't be jp? should be jpf_i
+        [Transition(8, ActionSymbol.jpf_save_i)]  # Todo: shouldn't be jp? should be jpf_i
     ],
     NT.RETURN_STMT: [
         [Transition(1, T_ID(TokenType.KEYWORD, "return"))],
         [Transition(2, NT.RETURN_STMT_PRIME)]
     ],
     NT.RETURN_STMT_PRIME: [
-        [Transition(1, NT.EXPRESSION), Transition(2, T_ID(TokenType.SYMBOL, ";"))],
+        [Transition(1, NT.EXPRESSION), Transition(3, T_ID(TokenType.SYMBOL, ";"))],
         [Transition(2, T_ID(TokenType.SYMBOL, ";"))],
-        [Transition(3, ActionSymbol.return_result)]
+        [Transition(4, ActionSymbol.return_result)],
+        [Transition(4, ActionSymbol.return_from_func)]
     ],
     NT.EXPRESSION: [
         [Transition(1, TokenType.ID), Transition(3, NT.SIMPLE_EXPRESSION_ZEGOND)],
-        [Transition(2, ActionSymbol.pid)],  # Todo: Shouldn't have diff number and then B also?
+        [Transition(2, ActionSymbol.determine_id)],  # Todo: Shouldn't have diff number and then B also?
         [Transition(3, NT.B)]
     ],
     NT.B: [
@@ -688,8 +689,8 @@ T_DIAGRAMS: Dict[NT, List[List[Transition]]] = {
         [Transition(1, T_ID(TokenType.SYMBOL, "(")), Transition(3, TokenType.ID), Transition(4, TokenType.NUM)],
         [Transition(2, NT.EXPRESSION)],
         [Transition(6, T_ID(TokenType.SYMBOL, ")"))],
-        [Transition(5, ActionSymbol.pid)],
-        [Transition(6, ActionSymbol.ptoken)],
+        [Transition(5, ActionSymbol.determine_id)],
+        [Transition(6, ActionSymbol.pnum)],
         [Transition(6, NT.VAR_CALL_PRIME)]  # Todo: Correct?
     ],
     NT.VAR_CALL_PRIME: [
@@ -716,7 +717,7 @@ T_DIAGRAMS: Dict[NT, List[List[Transition]]] = {
         [Transition(1, T_ID(TokenType.SYMBOL, "(")), Transition(3, TokenType.NUM)],
         [Transition(2, NT.EXPRESSION)],
         [Transition(4, T_ID(TokenType.SYMBOL, ")"))],
-        [Transition(4, ActionSymbol.ptoken)]
+        [Transition(4, ActionSymbol.pnum)]
     ],
     NT.ARGS: [
         [Transition(1, NT.ARG_LIST), Transition(1, EPSILON)]

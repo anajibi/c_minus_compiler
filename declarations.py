@@ -19,7 +19,7 @@ class ActionSymbol(Enum):
     save = "save",
     jpf_save = "jpf_save",
     jp = "jp",
-    jpf_i = "jpf_i",
+    jpf_save_i = "jpf_save_i",
     save_i = "save_i",
     return_result = "return_result",
     determine_arr = "determine_arr",
@@ -30,7 +30,12 @@ class ActionSymbol(Enum):
     mult = "mult",
     start_args = "start_args",
     start_func = "start_func",
-    call_func = "call_func"
+    call_func = "call_func",
+    init_program = "init_program",
+    end_func = "end_func",
+    return_from_func = "return_from_func",
+    determine_id = "determine_id",
+    pnum = "pnum"
 
 
 class Nonterminal(Enum):
