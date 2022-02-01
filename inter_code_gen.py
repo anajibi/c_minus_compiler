@@ -409,7 +409,10 @@ class InterCodeGen:
 
     def determine_id(self, current_lexeme: Token):
         id = current_lexeme.lexeme
-        variable = self.symbol_table[(id, self.scope)]
+        if (id, self.scope) in self.symbol_table:
+            variable = self.symbol_table[(id, self.scope)]
+        else:
+            variable = self.symbol_table[(id, 0)]
         if variable.type == AttributeType.VAR or variable.type == AttributeType.LOCAL_VAR or variable.type == AttributeType.PAR_VAR:
             self.stack.append(variable.ptr)
         elif variable.type == AttributeType.FUNC:
@@ -418,10 +421,10 @@ class InterCodeGen:
             self.stack.append(indirect(variable.ptr))
 
     def delete_scope_one(self):
-        pass
-
-    def get_local_vars_num(self):
-        pass
+        for key in self.symbol_table.keys():
+            if key[1] == 1:
+                del self.ptr_table[self.symbol_table[key].ptr]
+                del self.symbol_table[key]
 
     def get_args(self):
         args = []
