@@ -24,12 +24,28 @@ def jp(operand):
     return ThreeStateCode(TSCType.JP, [operand])
 
 
+def jpf(operands):
+    return ThreeStateCode(TSCType.JPF, operands)
+
+
 def add(operands):
     return ThreeStateCode(TSCType.ADD, operands)
 
 
 def sub(operands):
     return ThreeStateCode(TSCType.SUB, operands)
+
+
+def mult(operands):
+    return ThreeStateCode(TSCType.MULT, operands)
+
+
+def equal(operands):
+    return ThreeStateCode(TSCType.EQ, operands)
+
+
+def less_than(operands):
+    return ThreeStateCode(TSCType.LT, operands)
 
 
 DATA_SEGMENT = 816
@@ -267,17 +283,29 @@ class InterCodeGen:
         self.stack.append(i)
 
     def jpf_save(self):
-        pass
+        self.code.append(assign([self.stack[-1], self.stack[-4]]))
+        i = len(self.code)
+        self.code[self.stack[-2]] = jpf([self.stack[-3], i + 1])
+        self.stack.pop()
+        self.stack.pop()
+        self.stack.pop()
+        self.stack.append(i)
 
     def jp(self):
-        pass
+        self.code.append(assign([self.stack[-1], self.stack[-3]]))
+        i = len(self.code)
+        self.code[self.stack[-2]] = jp(i)
+        self.stack.pop()
+        self.stack.pop()
 
     def save_i(self):
-        self.stack.append(len(self.code))
-
+        i = len(self.code)
+        self.stack.append(i)
 
     def jpf_save_i(self):
-        pass
+        self.code.append(jpf([self.stack[-1], self.code[-2]]))
+        self.stack.pop()
+        self.stack.pop()
 
     def assign(self):
         self.code.append(assign([self.stack.pop(), self.stack.pop()]))
@@ -292,14 +320,34 @@ class InterCodeGen:
         self.stack.append(number(int(current_token.lexeme)))
 
     def compare(self):
+        right_hand_side = self.stack.pop()
+        operator = self.stack.pop()
+        left_hand_side = self.stack.pop()
         temp = self.get_temp()
-
+        if operator == '<':
+            self.code.append(less_than([left_hand_side, right_hand_side, temp]))  # Todo: Direct?
+        elif operator == '==':
+            self.code.append(equal([left_hand_side, right_hand_side, temp]))
+        else:
+            print("ERROR")  # ERROR
 
     def addop(self):
-        pass
+        right_hand_side = self.stack.pop()
+        operator = self.stack.pop()
+        left_hand_side = self.stack.pop()
+        temp = self.get_temp()
+        if operator == '+':
+            self.code.append(add([left_hand_side, right_hand_side, temp]))  # Todo: Direct?
+        elif operator == '-':
+            self.code.append(sub([left_hand_side, right_hand_side, temp]))
+        else:
+            print("ERROR")  # ERROR
 
     def mult(self):
-        pass
+        right_hand_side = self.stack.pop()
+        left_hand_side = self.stack.pop()
+        temp = self.get_temp()
+        self.code.append(mult([left_hand_side, right_hand_side, temp]))  # Todo: Direct?
 
     def start_args(self):
         self.stack.append(START_ARGS_SYMBOL)
