@@ -1,6 +1,7 @@
 from enum import Enum
 from typing import Dict, List, Tuple, Union
 
+from constants import OUTPUT_FILE_NAME
 from declarations import Token, ActionSymbol
 
 
@@ -104,6 +105,9 @@ class ThreeStateCode:
     def __init__(self, OP, operands):
         self.OP = OP
         self.operands = operands
+
+    def __str__(self):
+        return f"({self.OP.value} {', '.join(map(lambda x:str(x),self.operands))})"
 
 
 class Attribute:
@@ -240,7 +244,7 @@ class InterCodeGen:
         attr = Attribute(ptr=addr, scope=self.scope)
         self.symbol_table[(curr_token.lexeme, self.scope)] = attr
         self.ptr_table[addr] = curr_token.lexeme
-        attr = self.find_id(addr)
+        attr = self.find_id(addr, self.scope)
         self.assign_type(attr, type)
         if self.scope == 0:
             attr.type = AttributeType.VAR
@@ -308,16 +312,19 @@ class InterCodeGen:
         self.symbol_table[(curr_token.lexeme, self.scope)] = attr
         self.ptr_table[ptr] = curr_token.lexeme
         self.scope = 1
+        self.function_info[ptr] = FunctionInfo([])
         self.assign_type(attr, type)
         self.stack.append(ptr)
+        self.param_list = []
+        self.local_var_list = []
 
     def stfunc(self):
         number_of_args = len(self.param_list)
         addr = self.stack.pop()
-        attribute = self.find_id(addr)
+        attribute = self.find_id(addr, 0)
         attribute.arg_cell_num = number_of_args
         attribute.type = AttributeType.FUNC
-        self.function_info[addr] = FunctionInfo(self.param_list)
+        self.function_info[addr].params = self.param_list
         if self.ptr_table[addr] == "main":
             global MAIN_STARTING_POINT
             MAIN_STARTING_POINT = addr
@@ -460,8 +467,8 @@ class InterCodeGen:
         else:
             attribute.out_type = AttributeOutType.VOID
 
-    def find_id(self, addr):
-        return self.symbol_table[(self.ptr_table[addr], self.scope)]
+    def find_id(self, addr, scope):
+        return self.symbol_table[(self.ptr_table[addr], scope)]
         # if (self.ptr_table[addr], self.scope) in self.symbol_table:
         #     return self.symbol_table[(self.ptr_table[addr], self.scope)]
         # else:
@@ -481,10 +488,10 @@ class InterCodeGen:
             self.stack.append(indirect(variable.ptr))
 
     def delete_scope_one(self):
-        for key in self.symbol_table.keys():
-            if key[1] == 1:
-                del self.ptr_table[self.symbol_table[key].ptr]
-                del self.symbol_table[key]
+        scope_one = [key for key in self.symbol_table.keys() if key[1] == 1]
+        for key in scope_one:
+            del self.ptr_table[self.symbol_table[key].ptr]
+            del self.symbol_table[key]
 
     def get_args(self):
         args = []
@@ -520,3 +527,9 @@ class InterCodeGen:
     def jump_to_main(self):
         self.code.append(jp(MAIN_STARTING_POINT))
         self.code[self.stack.pop()] = jp(len(self.code))
+
+    def save_inter_code(self):
+        f = open(OUTPUT_FILE_NAME, "wb")
+        for index, inter_code in enumerate(self.code):
+            f.write(f'{index}.\t{str(inter_code)}\n'.encode())
+        f.close()

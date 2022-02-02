@@ -159,4 +159,5 @@ class Parser:
 
         Parser.save_tree(head)
         Parser.save_syntax_errors(syntax_errors)
+        self.inter_code_gen.save_inter_code()
         return head
