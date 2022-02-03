@@ -160,3 +160,14 @@ class Syntax_Error:
 
     def __str__(self):
         return f'#{self.line_num} : syntax error, {self.text}'
+
+class Semantic_Error:
+    line_num: int
+    text: str
+
+    def __init__(self, line_num, text):
+        self.text = text
+        self.line_num = line_num
+
+    def __str__(self):
+        return f'#{self.line_num}: Semantic Error! {self.text}'
