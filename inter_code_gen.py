@@ -194,9 +194,9 @@ class InterCodeGen:
         elif action == ActionSymbol.stfunc:
             self.stfunc()
         elif action == ActionSymbol.st_param_arr:
-            self.st_param_arr()
+            self.st_param(is_arr=True)
         elif action == ActionSymbol.st_param_var:
-            self.st_param_var()
+            self.st_param(is_arr=False)
         elif action == ActionSymbol.pop_exp:
             self.pop_exp()
         elif action == ActionSymbol.break_val:
@@ -295,19 +295,7 @@ class InterCodeGen:
                 self.code += push_to_stack(temp_addr)
                 self.code += [assign([number(0), temp_addr])]
 
-    def st_param_var(self):
-        curr_token = self.stack.pop()
-        type = self.stack.pop()
-
-        temp = self.get_temp()
-        attr = Attribute(ptr=temp, scope=self.scope)
-        self.symbol_table[(curr_token.lexeme, self.scope)] = attr
-        self.ptr_table[temp] = curr_token.lexeme
-        attr.out_type = AttributeOutType.INT
-        attr.type = AttributeType.PAR_VAR
-        self.param_list.append((temp, attr))
-
-    def st_param_arr(self):
+    def st_param(self, is_arr: bool):
         curr_token = self.stack.pop()
         type = self.stack.pop()
         temp = self.get_temp()
@@ -315,7 +303,10 @@ class InterCodeGen:
         self.symbol_table[(curr_token.lexeme, self.scope)] = attr
         self.ptr_table[temp] = curr_token.lexeme
         attr.out_type = AttributeOutType.INT
-        attr.type = AttributeType.PAR_ARR
+        if is_arr:
+            attr.type = AttributeType.PAR_ARR
+        else:
+            attr.type = AttributeType.PAR_VAR
         self.param_list.append((temp, attr))
 
     def ptoken(self, curr_token: Token):
