@@ -427,7 +427,7 @@ class InterCodeGen:
         elif operator == '==':
             self.code.append(equal([left_hand_side, right_hand_side, temp]))
         else:
-            print("ERROR")  # ERROR
+            print("ERROR")
         self.stack.append(temp)
 
     def addop(self):
@@ -440,7 +440,7 @@ class InterCodeGen:
         elif operator == '-':
             self.code.append(sub([left_hand_side, right_hand_side, temp]))
         else:
-            print("ERROR")  # ERROR
+            print("ERROR")
         self.stack.append(temp)
 
     def mult(self):
