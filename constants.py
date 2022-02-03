@@ -9,6 +9,7 @@ TOKENS_FILE_NAME = "tokens.txt"
 LEXICAL_ERRORS_FILE_NAME = "lexical_errors.txt"
 PARSE_TREE_FILE_NAME = "parse_tree.txt"
 SYNTAX_ERRORS_FILE_NAME = "syntax_errors.txt"
+SEMANTIC_ERRORS_FILE_NAME = "semantic_errors.txt"
 KEYWORDS = ['if', 'else', 'void', 'int', 'repeat', 'break', 'until', 'return', 'endif']
 EPSILON = "epsilon"
 
