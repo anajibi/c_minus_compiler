@@ -5,7 +5,6 @@ from typing import Union, List
 class ActionSymbol(Enum):
     ptoken = "ptoken",
     pid = "pid",
-    pid_param = "pid_param",
     starr = "starr",
     stvar = "stvar",
     stfunc = "stfunc",

@@ -187,8 +187,6 @@ class InterCodeGen:
             self.ptoken(curr_token)
         elif action == ActionSymbol.pid:
             self.pid(curr_token)
-        elif action == ActionSymbol.pid_param:
-            self.pid(curr_token)
         elif action == ActionSymbol.starr:
             self.starr()
         elif action == ActionSymbol.stvar:
@@ -211,7 +209,6 @@ class InterCodeGen:
             self.jpf_save_i()
         elif action == ActionSymbol.jp:
             self.jp()
-
         elif action == ActionSymbol.save_i:
             self.save_i()
         elif action == ActionSymbol.determine_arr:
