@@ -3,6 +3,7 @@ from typing import Dict, List, Tuple, Union
 
 from constants import OUTPUT_FILE_NAME
 from declarations import Token, ActionSymbol
+from semantic_analyzer import SemanticAnalyzer
 
 
 def assign(operands):
@@ -158,6 +159,7 @@ class InterCodeGen:
     current_scope_func: str or None
     function_temps: List[int]
     break_list: List[int]
+    semantic_analyzer: SemanticAnalyzer
 
     def __init__(self):
         self.symbol_table = {}
@@ -176,6 +178,7 @@ class InterCodeGen:
         attr.arg_cell_num = 1
         self.symbol_table[("output", 0)] = attr
         self.break_list = []
+        self.semantic_analyzer = SemanticAnalyzer()
 
     def initiate_code(self):
         self.code += [assign([number(0), PRINT_VARIABLE]), assign([number(STACK_SEGMENT), TOP_SP]),
