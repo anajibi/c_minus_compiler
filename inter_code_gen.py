@@ -423,7 +423,7 @@ class InterCodeGen:
         left_hand_side = self.stack.pop()
         temp = self.get_temp()
         if operator == '<':
-            self.code.append(less_than([left_hand_side, right_hand_side, temp]))  # Todo: Direct?
+            self.code.append(less_than([left_hand_side, right_hand_side, temp]))
         elif operator == '==':
             self.code.append(equal([left_hand_side, right_hand_side, temp]))
         else:
@@ -436,7 +436,7 @@ class InterCodeGen:
         left_hand_side = self.stack.pop()
         temp = self.get_temp()
         if operator == '+':
-            self.code.append(add([left_hand_side, right_hand_side, temp]))  # Todo: Direct?
+            self.code.append(add([left_hand_side, right_hand_side, temp]))
         elif operator == '-':
             self.code.append(sub([left_hand_side, right_hand_side, temp]))
         else:
@@ -447,7 +447,7 @@ class InterCodeGen:
         right_hand_side = self.stack.pop()
         left_hand_side = self.stack.pop()
         temp = self.get_temp()
-        self.code.append(mult([left_hand_side, right_hand_side, temp]))  # Todo: Direct?
+        self.code.append(mult([left_hand_side, right_hand_side, temp]))
         self.stack.append(temp)
 
     def start_args(self):

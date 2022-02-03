@@ -15,7 +15,7 @@ EPSILON = "epsilon"
 N_TERMINALS_INFO: Dict[NT, NTerminalInfo] = {
     NT.PROGRAM: NTerminalInfo(
         [
-            T_ID(TokenType.EOF, "$"), T_ID(TokenType.KEYWORD, "int"), T_ID(TokenType.KEYWORD, "void")  # Todo: Sure?
+            T_ID(TokenType.EOF, "$"), T_ID(TokenType.KEYWORD, "int"), T_ID(TokenType.KEYWORD, "void")
         ],
         [
             T_ID(TokenType.EOF, "$")
@@ -523,7 +523,7 @@ T_DIAGRAMS: Dict[NT, List[List[Transition]]] = {
     ],
     NT.TYPE_SPECIFIER: [
         [Transition(1, T_ID(TokenType.KEYWORD, "int")), Transition(1, T_ID(TokenType.KEYWORD, "void"))],
-        [Transition(2, ActionSymbol.ptoken)],  # Todo: Should be one right?
+        [Transition(2, ActionSymbol.ptoken)],
     ],
     NT.PARAMS: [
         [Transition(1, T_ID(TokenType.KEYWORD, "int")), Transition(6, T_ID(TokenType.KEYWORD, "void"))],
@@ -535,7 +535,6 @@ T_DIAGRAMS: Dict[NT, List[List[Transition]]] = {
     ],
     NT.PARAM_LIST: [
         [Transition(1, T_ID(TokenType.SYMBOL, ",")), Transition(3, EPSILON)],
-        # Todo: Should be instead of EPSILON right? NO This should be like this
         [Transition(2, NT.PARAM)],
         [Transition(3, NT.PARAM_LIST)],
     ],
@@ -601,7 +600,7 @@ T_DIAGRAMS: Dict[NT, List[List[Transition]]] = {
         [Transition(5, T_ID(TokenType.SYMBOL, "("))],
         [Transition(6, NT.EXPRESSION)],
         [Transition(7, T_ID(TokenType.SYMBOL, ")"))],
-        [Transition(8, ActionSymbol.jpf_save_i)]  # Todo: shouldn't be jp? should be jpf_i
+        [Transition(8, ActionSymbol.jpf_save_i)]
     ],
     NT.RETURN_STMT: [
         [Transition(1, T_ID(TokenType.KEYWORD, "return"))],
@@ -615,7 +614,7 @@ T_DIAGRAMS: Dict[NT, List[List[Transition]]] = {
     ],
     NT.EXPRESSION: [
         [Transition(1, TokenType.ID), Transition(3, NT.SIMPLE_EXPRESSION_ZEGOND)],
-        [Transition(2, ActionSymbol.determine_id)],  # Todo: Shouldn't have diff number and then B also?
+        [Transition(2, ActionSymbol.determine_id)],
         [Transition(3, NT.B)]
     ],
     NT.B: [
@@ -626,14 +625,14 @@ T_DIAGRAMS: Dict[NT, List[List[Transition]]] = {
         [Transition(4, T_ID(TokenType.SYMBOL, "]"))],
         [Transition(5, ActionSymbol.determine_arr)],
         [Transition(7, NT.H)],
-        [Transition(7, ActionSymbol.assign)]  # Todo: probably wrong number
+        [Transition(7, ActionSymbol.assign)]
     ],
     NT.H: [
         [Transition(1, NT.G), Transition(3, T_ID(TokenType.SYMBOL, "="))],
         [Transition(2, NT.D)],
         [Transition(5, NT.C)],
         [Transition(4, NT.EXPRESSION)],
-        [Transition(5, ActionSymbol.assign)]  # Todo: No idea about number
+        [Transition(5, ActionSymbol.assign)]
     ],
     NT.SIMPLE_EXPRESSION_ZEGOND: [
         [Transition(1, NT.ADDITIVE_EXPRESSION_ZEGOND)],
@@ -698,7 +697,7 @@ T_DIAGRAMS: Dict[NT, List[List[Transition]]] = {
         [Transition(6, T_ID(TokenType.SYMBOL, ")"))],
         [Transition(5, ActionSymbol.determine_id)],
         [Transition(6, ActionSymbol.pnum)],
-        [Transition(6, NT.VAR_CALL_PRIME)]  # Todo: Correct?
+        [Transition(6, NT.VAR_CALL_PRIME)]
     ],
     NT.VAR_CALL_PRIME: [
         [Transition(1, T_ID(TokenType.SYMBOL, "(")), Transition(5, NT.VAR_PRIME)],
