@@ -1,5 +1,7 @@
+from typing import List
 from anytree import Node, RenderTree
-from constants import T_DIAGRAMS, N_TERMINALS_INFO, EPSILON, PARSE_TREE_FILE_NAME, SYNTAX_ERRORS_FILE_NAME
+from constants import SEMANTIC_ERRORS_FILE_NAME, T_DIAGRAMS, N_TERMINALS_INFO, EPSILON, PARSE_TREE_FILE_NAME, \
+    SYNTAX_ERRORS_FILE_NAME
 from declarations import Nonterminal as NT, Token, State, TokenType, T_ID, Syntax_Error, ActionSymbol
 
 prev_token = None
@@ -67,6 +69,16 @@ class Parser:
         f.close()
 
     @staticmethod
+    def save_semantic_errors(semantic_errors):
+        f = open(SEMANTIC_ERRORS_FILE_NAME, "+w")
+        if len(semantic_errors) == 0:
+            f.write("The input program is semantically correct.")
+        else:
+            for error in semantic_errors:
+                f.write(str(error) + "\n")
+        f.close()
+
+    @staticmethod
     def all_terminals(state_transitions):
         for transition in state_transitions:
             if (isinstance(transition.identifier, NT) or transition.identifier == EPSILON) or (
@@ -98,7 +110,7 @@ class Parser:
 
     def parse(self):
         global prev_token
-        syntax_errors: list[Syntax_Error] = []
+        syntax_errors: List[Syntax_Error] = []
         accepted = False
         head = Node(NT.PROGRAM.value)
         stack = []
@@ -159,5 +171,8 @@ class Parser:
 
         Parser.save_tree(head)
         Parser.save_syntax_errors(syntax_errors)
-        self.inter_code_gen.save_inter_code()
+
+        semantic_errors = self.inter_code_gen.semantic_analyzer.semantic_errors
+        Parser.save_semantic_errors(semantic_errors)
+        self.inter_code_gen.save_inter_code(has_semantic_error=(len(semantic_errors) != 0))
         return head

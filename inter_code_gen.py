@@ -191,29 +191,36 @@ class InterCodeGen:
         elif action == ActionSymbol.pid:
             self.pid(curr_token)
         elif action == ActionSymbol.starr:
-            self.starr()
+            type_val, curr_token = self.starr()
+            self.check_void_type(type_val, curr_token)
         elif action == ActionSymbol.stvar:
-            self.stvar()
+            type_val, curr_token = self.stvar()
+            self.check_void_type(type_val, curr_token)
         elif action == ActionSymbol.stfunc:
             self.stfunc()
         elif action == ActionSymbol.st_param_arr:
-            self.st_param(is_arr=True)
+            type_val, curr_token = self.st_param(is_arr=True)
+            self.check_void_type(type_val, curr_token)
         elif action == ActionSymbol.st_param_var:
-            self.st_param(is_arr=False)
+            type_val, curr_token = self.st_param(is_arr=False)
+            self.check_void_type(type_val, curr_token)
         elif action == ActionSymbol.pop_exp:
             self.pop_exp()
         elif action == ActionSymbol.break_val:
             self.break_val()
+            self.check_break(curr_token)
         elif action == ActionSymbol.save:
             self.save()
         elif action == ActionSymbol.jpf_save:
             self.jpf_save()
         elif action == ActionSymbol.jpf_save_i:
             self.jpf_save_i()
+            self.semantic_analyzer.is_break_inside_loop = False
         elif action == ActionSymbol.jp:
             self.jp()
         elif action == ActionSymbol.save_i:
             self.save_i()
+            self.semantic_analyzer.is_break_inside_loop = True
         elif action == ActionSymbol.determine_arr:
             self.determine_arr()
         elif action == ActionSymbol.return_result:
@@ -273,6 +280,8 @@ class InterCodeGen:
             self.code += push_to_stack(addr)
             self.code.append(assign([number(0), addr]))
 
+        return type_val, curr_token
+
     def starr(self):
         num_cells = int(self.stack.pop().lexeme)
         curr_token = self.stack.pop()
@@ -298,6 +307,8 @@ class InterCodeGen:
                 self.code += push_to_stack(temp_addr)
                 self.code += [assign([number(0), temp_addr])]
 
+        return type_val, curr_token
+
     def st_param(self, is_arr: bool):
         curr_token = self.stack.pop()
         type_val = self.stack.pop()
@@ -311,6 +322,7 @@ class InterCodeGen:
         else:
             attr.type = AttributeType.PAR_VAR
         self.param_list.append((temp, attr))
+        return type_val, curr_token
 
     def ptoken(self, curr_token: Token):
         self.stack.append(curr_token)
@@ -548,8 +560,19 @@ class InterCodeGen:
         self.code.append(jp(MAIN_STARTING_POINT))
         self.code[self.stack.pop()] = jp(len(self.code))
 
-    def save_inter_code(self):
+    def save_inter_code(self, has_semantic_error: bool):
         f = open(OUTPUT_FILE_NAME, "wb")
-        for index, inter_code in enumerate(self.code):
-            f.write(f'{index}.\t{str(inter_code)}\n'.encode())
+        if has_semantic_error:
+            f.write('The code has not been generated.'.encode())
+        else:
+            for index, inter_code in enumerate(self.code):
+                f.write(f'{index}.\t{str(inter_code)}\n'.encode())
         f.close()
+
+    def check_void_type(self, type_val, curr_token):
+        if SemanticAnalyzer.is_void_type(type_val.lexeme):
+            self.semantic_analyzer.make_void_type_error(curr_token)
+
+    def check_break(self, curr_token):
+        if not self.semantic_analyzer.is_break_inside_loop:
+            self.semantic_analyzer.make_break_error(curr_token)
