@@ -526,11 +526,12 @@ T_DIAGRAMS: Dict[NT, List[List[Transition]]] = {
         [Transition(2, ActionSymbol.ptoken)],  # Todo: Should be one right?
     ],
     NT.PARAMS: [
-        [Transition(1, T_ID(TokenType.KEYWORD, "int")), Transition(5, T_ID(TokenType.KEYWORD, "void"))],
-        [Transition(2, TokenType.ID)],
-        [Transition(3, ActionSymbol.pid)],
-        [Transition(4, NT.PARAM_PRIME)],
-        [Transition(5, NT.PARAM_LIST)],
+        [Transition(1, T_ID(TokenType.KEYWORD, "int")), Transition(6, T_ID(TokenType.KEYWORD, "void"))],
+        [Transition(2, ActionSymbol.ptoken)],
+        [Transition(3, TokenType.ID)],
+        [Transition(4, ActionSymbol.pid)],
+        [Transition(5, NT.PARAM_PRIME)],
+        [Transition(6, NT.PARAM_LIST)],
     ],
     NT.PARAM_LIST: [
         [Transition(1, T_ID(TokenType.SYMBOL, ",")), Transition(3, EPSILON)],
@@ -540,12 +541,14 @@ T_DIAGRAMS: Dict[NT, List[List[Transition]]] = {
     ],
     NT.PARAM: [
         [Transition(1, NT.DECLARATION_INITIAL)],
-        [Transition(2, NT.PARAM_PRIME)],
+        [Transition(2, ActionSymbol.pid)],
+        [Transition(3, NT.PARAM_PRIME)],
     ],
     NT.PARAM_PRIME: [
         [Transition(1, T_ID(TokenType.SYMBOL, "[")), Transition(3, ActionSymbol.st_param_var)],
         [Transition(2, T_ID(TokenType.SYMBOL, "]"))],
-        [Transition(3, ActionSymbol.st_param_arr)],
+        [Transition(4, ActionSymbol.st_param_arr)],
+        [Transition(4, EPSILON)],
     ],
     NT.COMPOUND_STMT: [
         [Transition(1, T_ID(TokenType.SYMBOL, "{"))],
@@ -567,10 +570,12 @@ T_DIAGRAMS: Dict[NT, List[List[Transition]]] = {
         ]
     ],
     NT.EXPRESSION_STMT: [
-        [Transition(1, NT.EXPRESSION), Transition(1, T_ID(TokenType.KEYWORD, "break")),
+        [Transition(1, NT.EXPRESSION), Transition(3, T_ID(TokenType.KEYWORD, "break")),
          Transition(2, T_ID(TokenType.SYMBOL, ";"))],
         [Transition(2, T_ID(TokenType.SYMBOL, ";"))],
-        [Transition(3, ActionSymbol.pop_exp), Transition(3, ActionSymbol.break_val)]
+        [Transition(5, ActionSymbol.pop_exp)],
+        [Transition(4, T_ID(TokenType.SYMBOL, ";"))],
+        [Transition(5, ActionSymbol.break_val)]
     ],
     NT.SELECTION_STMT: [
         [Transition(1, T_ID(TokenType.KEYWORD, "if"))],
