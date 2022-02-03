@@ -109,23 +109,23 @@ class TSCType(Enum):
 
 
 class ThreeStateCode:
-    OP: TSCType
+    op: TSCType
     operands: List
 
-    def __init__(self, OP, operands):
-        self.OP = OP
+    def __init__(self, op, operands):
+        self.op = op
         self.operands = operands
 
     def __str__(self):
-        return f"({self.OP.enum_to_str()}, {', '.join(map(lambda x: str(x), self.operands))})"
+        return f"({self.op.enum_to_str()}, {', '.join(map(lambda x: str(x), self.operands))})"
 
 
 class Attribute:
     ptr: int  # int i-> 400; int a[5] 400 -> 404, 408, ... 420; int a[] -> 400 -> 500
     scope: int
-    out_type: AttributeOutType
-    arg_cell_num: int
-    type: AttributeType
+    out_type: AttributeOutType or None
+    arg_cell_num: int or None
+    type: AttributeType or None
 
     def __init__(self, ptr, scope):
         self.ptr = ptr
@@ -155,7 +155,7 @@ class InterCodeGen:
     scope: int
     data_seg_ptr: int
     param_list: List[Tuple[int, Attribute]]
-    current_scope_func: str
+    current_scope_func: str or None
     function_temps: List[int]
     break_list: List[int]
 
@@ -242,7 +242,7 @@ class InterCodeGen:
         else:
             raise Exception("Invalid action symbol")
 
-    def get_temp(self, num_cells=1) -> number:
+    def get_temp(self, num_cells=1) -> int:
         temp = self.data_seg_ptr
         self.data_seg_ptr += BLOCK_SIZE * num_cells
         if self.scope == 1:
@@ -254,13 +254,13 @@ class InterCodeGen:
 
     def stvar(self):
         curr_token = self.stack.pop()
-        type = self.stack.pop()
+        type_val = self.stack.pop()
         addr = self.get_temp()
         attr = Attribute(ptr=addr, scope=self.scope)
         self.symbol_table[(curr_token.lexeme, self.scope)] = attr
         self.ptr_table[addr] = curr_token.lexeme
         attr = self.find_id(addr, self.scope)
-        self.assign_type(attr, type)
+        self.assign_type(attr, type_val)
         if self.scope == 0:
             attr.type = AttributeType.VAR
             self.code.append(assign([number(0), addr]))
@@ -273,13 +273,13 @@ class InterCodeGen:
     def starr(self):
         num_cells = int(self.stack.pop().lexeme)
         curr_token = self.stack.pop()
-        type = self.stack.pop()
+        type_val = self.stack.pop()
         addr = self.get_temp()
         starting_point = self.get_temp(num_cells)
         attr = Attribute(ptr=addr, scope=self.scope)
         self.symbol_table[(curr_token.lexeme, self.scope)] = attr
         self.ptr_table[addr] = curr_token.lexeme
-        self.assign_type(attr, type)
+        self.assign_type(attr, type_val)
         attr.arg_cell_num = int(num_cells)
         if self.scope == 0:
             attr.type = AttributeType.ARR
@@ -297,7 +297,7 @@ class InterCodeGen:
 
     def st_param(self, is_arr: bool):
         curr_token = self.stack.pop()
-        type = self.stack.pop()
+        type_val = self.stack.pop()
         temp = self.get_temp()
         attr = Attribute(ptr=temp, scope=self.scope)
         self.symbol_table[(curr_token.lexeme, self.scope)] = attr
@@ -313,7 +313,7 @@ class InterCodeGen:
         self.stack.append(curr_token)
 
     def start_func(self, curr_token: Token):
-        type = self.stack.pop()
+        type_val = self.stack.pop()
         ptr = len(self.code) + 1
         self.current_scope_func = curr_token.lexeme
         self.code.append("")
@@ -322,7 +322,7 @@ class InterCodeGen:
         self.ptr_table[ptr] = curr_token.lexeme
         self.scope = 1
         self.function_info[ptr] = FunctionInfo([])
-        self.assign_type(attr, type)
+        self.assign_type(attr, type_val)
         self.stack.append(ptr)
         self.param_list = []
 
@@ -451,10 +451,10 @@ class InterCodeGen:
         else:
             self.code += push_to_stack(RETURN_ADDRESS)
             self.save_and_copy_args(args, func_ptr)
-            self.push_temps(func_ptr) # this line is not needed for not-recursive functions
+            self.push_temps(func_ptr)  # this line is not needed for not-recursive functions
             self.code.append(assign([number(len(self.code) + 2), RETURN_ADDRESS]))
             self.code.append(jp(func_ptr))
-            self.pop_temps(func_ptr) # this line is not needed for not-recursive functions
+            self.pop_temps(func_ptr)  # this line is not needed for not-recursive functions
             for param in reversed(self.function_info[func_ptr].params):
                 self.code += pop_from_stack(param[0])
             self.code += pop_from_stack(RETURN_ADDRESS)
@@ -474,34 +474,32 @@ class InterCodeGen:
     def init_program(self):
         self.init_all_temps()
         self.jump_to_main()
-        # var = self.stack.pop()
-        # self.code[var] = jp(len(self.code))
 
     @staticmethod
-    def assign_type(attribute, type):
-        if type.lexeme == "int":
+    def assign_type(attribute, type_val):
+        if type_val.lexeme == "int":
             attribute.out_type = AttributeOutType.INT
         else:
             attribute.out_type = AttributeOutType.VOID
 
     def find_id(self, addr, scope):
         return self.symbol_table[(self.ptr_table[addr], scope)]
-        # if (self.ptr_table[addr], self.scope) in self.symbol_table:
-        #     return self.symbol_table[(self.ptr_table[addr], self.scope)]
-        # else:
-        #     return self.symbol_table[(self.ptr_table[addr], 0)]
 
     def determine_id(self, current_lexeme: Token):
-        id = current_lexeme.lexeme
-        if (id, self.scope) in self.symbol_table:
-            variable = self.symbol_table[(id, self.scope)]
+        id_val = current_lexeme.lexeme
+        if (id_val, self.scope) in self.symbol_table:
+            variable = self.symbol_table[(id_val, self.scope)]
         else:
-            variable = self.symbol_table[(id, 0)]
-        if variable.type == AttributeType.VAR or variable.type == AttributeType.LOCAL_VAR or variable.type == AttributeType.PAR_VAR:
+            variable = self.symbol_table[(id_val, 0)]
+        if variable.type == AttributeType.VAR \
+                or variable.type == AttributeType.LOCAL_VAR \
+                or variable.type == AttributeType.PAR_VAR:
             self.stack.append(variable.ptr)
         elif variable.type == AttributeType.FUNC:
             self.stack.append(variable.ptr)
-        elif variable.type == AttributeType.ARR or variable.type == AttributeType.PAR_ARR or variable.type == AttributeType.LOCAL_ARR:
+        elif variable.type == AttributeType.ARR \
+                or variable.type == AttributeType.PAR_ARR \
+                or variable.type == AttributeType.LOCAL_ARR:
             self.stack.append(indirect(variable.ptr))
 
     def delete_scope_one(self):
