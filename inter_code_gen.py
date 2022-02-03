@@ -463,10 +463,10 @@ class InterCodeGen:
         else:
             self.code += push_to_stack(RETURN_ADDRESS)
             self.save_and_copy_args(args, func_ptr)
-            self.push_temps(func_ptr)
+            self.push_temps(func_ptr) # this line is not needed for not-recursive functions
             self.code.append(assign([number(len(self.code) + 2), RETURN_ADDRESS]))
             self.code.append(jp(func_ptr))
-            self.pop_temps(func_ptr)
+            self.pop_temps(func_ptr) # this line is not needed for not-recursive functions
             for param in reversed(self.function_info[func_ptr].params):
                 self.code += pop_from_stack(param[0])
             self.code += pop_from_stack(RETURN_ADDRESS)
