@@ -192,35 +192,35 @@ class InterCodeGen:
             self.pid(curr_token)
         elif action == ActionSymbol.starr:
             type_val, curr_token = self.starr()
-            self.check_void_type(type_val, curr_token)
+            self.semantic_analyzer.check_void_type(type_val, curr_token)
         elif action == ActionSymbol.stvar:
             type_val, curr_token = self.stvar()
-            self.check_void_type(type_val, curr_token)
+            self.semantic_analyzer.check_void_type(type_val, curr_token)
         elif action == ActionSymbol.stfunc:
             self.stfunc()
         elif action == ActionSymbol.st_param_arr:
             type_val, curr_token = self.st_param(is_arr=True)
-            self.check_void_type(type_val, curr_token)
+            self.semantic_analyzer.check_void_type(type_val, curr_token)
         elif action == ActionSymbol.st_param_var:
             type_val, curr_token = self.st_param(is_arr=False)
-            self.check_void_type(type_val, curr_token)
+            self.semantic_analyzer.check_void_type(type_val, curr_token)
         elif action == ActionSymbol.pop_exp:
             self.pop_exp()
         elif action == ActionSymbol.break_val:
             self.break_val()
-            self.check_break(curr_token)
+            self.semantic_analyzer.check_break(curr_token)
         elif action == ActionSymbol.save:
             self.save()
         elif action == ActionSymbol.jpf_save:
             self.jpf_save()
         elif action == ActionSymbol.jpf_save_i:
             self.jpf_save_i()
-            self.semantic_analyzer.is_break_inside_loop = False
+            self.semantic_analyzer.break_is_outside()
         elif action == ActionSymbol.jp:
             self.jp()
         elif action == ActionSymbol.save_i:
             self.save_i()
-            self.semantic_analyzer.is_break_inside_loop = True
+            self.semantic_analyzer.break_is_inside()
         elif action == ActionSymbol.determine_arr:
             self.determine_arr()
         elif action == ActionSymbol.return_result:
@@ -238,7 +238,9 @@ class InterCodeGen:
         elif action == ActionSymbol.start_func:
             self.start_func(curr_token)
         elif action == ActionSymbol.call_func:
-            self.call_func()
+            called_args_num, func_ptr = self.call_func()
+            self.semantic_analyzer.check_args_num(self.ptr_table, self.symbol_table, called_args_num, func_ptr,
+                                                  curr_token)
         elif action == ActionSymbol.init_program:
             self.init_program()
         elif action == ActionSymbol.end_func:
@@ -246,7 +248,10 @@ class InterCodeGen:
         elif action == ActionSymbol.return_from_func:
             self.return_from_func()
         elif action == ActionSymbol.determine_id:
-            self.determine_id(curr_token)
+            if self.semantic_analyzer.check_is_defined(curr_token, self.symbol_table):
+                self.determine_id(curr_token, is_determined=True)
+            else:
+                self.determine_id(curr_token, is_determined=False)
         elif action == ActionSymbol.pnum:
             self.pnum(curr_token)
         else:
@@ -459,7 +464,9 @@ class InterCodeGen:
     def call_func(self):
         args = self.get_args()
         func_ptr = self.stack.pop()
-        if self.ptr_table[func_ptr] == "output":
+        if func_ptr == -1:
+            self.stack.append(PRINT_VARIABLE)  # For undefined ID
+        elif self.ptr_table[func_ptr] == "output":
             self.code.append(assign([args[0], PRINT_VARIABLE]))
             self.code.append(ThreeStateCode(TSCType.PRINT, [PRINT_VARIABLE]))
             self.stack.append(PRINT_VARIABLE)
@@ -476,6 +483,8 @@ class InterCodeGen:
             temp = self.get_temp()
             self.code.append(assign([RETURN_VARIABLE, temp]))
             self.stack.append(temp)
+
+        return len(args), func_ptr
 
     def return_result(self):
         self.code.append(assign([self.stack.pop(), RETURN_VARIABLE]))
@@ -500,22 +509,25 @@ class InterCodeGen:
     def find_id(self, addr, scope):
         return self.symbol_table[(self.ptr_table[addr], scope)]
 
-    def determine_id(self, current_lexeme: Token):
-        id_val = current_lexeme.lexeme
-        if (id_val, self.scope) in self.symbol_table:
-            variable = self.symbol_table[(id_val, self.scope)]
+    def determine_id(self, current_token: Token, is_determined: bool):
+        if is_determined:
+            id_val = current_token.lexeme
+            if (id_val, self.scope) in self.symbol_table:
+                variable = self.symbol_table[(id_val, self.scope)]
+            else:
+                variable = self.symbol_table[(id_val, 0)]
+            if variable.type == AttributeType.VAR \
+                    or variable.type == AttributeType.LOCAL_VAR \
+                    or variable.type == AttributeType.PAR_VAR:
+                self.stack.append(variable.ptr)
+            elif variable.type == AttributeType.FUNC:
+                self.stack.append(variable.ptr)
+            elif variable.type == AttributeType.ARR \
+                    or variable.type == AttributeType.PAR_ARR \
+                    or variable.type == AttributeType.LOCAL_ARR:
+                self.stack.append(indirect(variable.ptr))
         else:
-            variable = self.symbol_table[(id_val, 0)]
-        if variable.type == AttributeType.VAR \
-                or variable.type == AttributeType.LOCAL_VAR \
-                or variable.type == AttributeType.PAR_VAR:
-            self.stack.append(variable.ptr)
-        elif variable.type == AttributeType.FUNC:
-            self.stack.append(variable.ptr)
-        elif variable.type == AttributeType.ARR \
-                or variable.type == AttributeType.PAR_ARR \
-                or variable.type == AttributeType.LOCAL_ARR:
-            self.stack.append(indirect(variable.ptr))
+            self.stack.append(-1)
 
     def delete_scope_one(self):
         scope_one = [key for key in self.symbol_table.keys() if key[1] == 1]
@@ -568,11 +580,3 @@ class InterCodeGen:
             for index, inter_code in enumerate(self.code):
                 f.write(f'{index}.\t{str(inter_code)}\n'.encode())
         f.close()
-
-    def check_void_type(self, type_val, curr_token):
-        if SemanticAnalyzer.is_void_type(type_val.lexeme):
-            self.semantic_analyzer.make_void_type_error(curr_token)
-
-    def check_break(self, curr_token):
-        if not self.semantic_analyzer.is_break_inside_loop:
-            self.semantic_analyzer.make_break_error(curr_token)
