@@ -170,4 +170,4 @@ class Semantic_Error:
         self.line_num = line_num
 
     def __str__(self):
-        return f'#{self.line_num}: Semantic Error! {self.text}'
+        return f'#{self.line_num} : Semantic Error! {self.text}'
