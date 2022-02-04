@@ -82,7 +82,7 @@ class AttributeOutType(Enum):
 
 
 class AttributeType(Enum):
-    FUNC = "funciton",
+    FUNC = "function",
     ARR = "array",
     VAR = "var",
     PAR_VAR = "param_var",
@@ -190,6 +190,7 @@ class InterCodeGen:
             self.ptoken(curr_token)
         elif action == ActionSymbol.pid:
             self.pid(curr_token)
+            self.semantic_analyzer.push_type(curr_token, AttributeType.VAR, self.current_scope_func)
         elif action == ActionSymbol.starr:
             type_val, curr_token = self.starr()
             self.semantic_analyzer.check_void_type(type_val, curr_token)
@@ -206,6 +207,7 @@ class InterCodeGen:
             self.semantic_analyzer.check_void_type(type_val, curr_token)
         elif action == ActionSymbol.pop_exp:
             self.pop_exp()
+            self.semantic_analyzer.empty_type_stack()
         elif action == ActionSymbol.break_val:
             self.break_val()
             self.semantic_analyzer.check_break(curr_token)
@@ -223,24 +225,34 @@ class InterCodeGen:
             self.semantic_analyzer.break_is_inside()
         elif action == ActionSymbol.determine_arr:
             self.determine_arr()
+            self.semantic_analyzer.type_arr_is_int(curr_token)
         elif action == ActionSymbol.return_result:
             self.return_result()
         elif action == ActionSymbol.assign:
             self.assign()
         elif action == ActionSymbol.compare:
-            self.compare()
+            right_hand_side, left_hand_side = self.compare()
+            self.semantic_analyzer.check_op(right_hand_side, left_hand_side, curr_token)
         elif action == ActionSymbol.addop:
-            self.addop()
+            right_hand_side, left_hand_side = self.addop()
+            self.semantic_analyzer.check_op(right_hand_side, left_hand_side, curr_token)
         elif action == ActionSymbol.mult:
-            self.mult()
+            right_hand_side, left_hand_side = self.mult()
+            self.semantic_analyzer.check_op(right_hand_side, left_hand_side, curr_token)
         elif action == ActionSymbol.start_args:
             self.start_args()
         elif action == ActionSymbol.start_func:
             self.start_func(curr_token)
         elif action == ActionSymbol.call_func:
-            called_args_num, func_ptr = self.call_func()
-            self.semantic_analyzer.check_args_num(self.ptr_table, self.symbol_table, called_args_num, func_ptr,
-                                                  curr_token)
+            args, func_ptr = self.call_func()
+            if self.semantic_analyzer.check_is_args_num_ok(self.ptr_table, self.symbol_table, len(args), func_ptr,
+                                                           curr_token):
+                if func_ptr != OUTPUT_PTR:
+                    self.semantic_analyzer.check_is_args_type_ok(self.ptr_table, self.symbol_table,
+                                                                 self.function_info[func_ptr].params, args, func_ptr,
+                                                                 curr_token)  # self.param_list might be empty
+                    self.semantic_analyzer.type_func_is_int_void(len(args), func_ptr, self.symbol_table, self.ptr_table)
+
         elif action == ActionSymbol.init_program:
             self.init_program()
         elif action == ActionSymbol.end_func:
@@ -249,11 +261,13 @@ class InterCodeGen:
             self.return_from_func()
         elif action == ActionSymbol.determine_id:
             if self.semantic_analyzer.check_is_defined(curr_token, self.symbol_table):
-                self.determine_id(curr_token, is_determined=True)
+                variable = self.determine_id(curr_token, is_determined=True)
+                self.semantic_analyzer.push_type(curr_token, variable.type, self.current_scope_func)
             else:
                 self.determine_id(curr_token, is_determined=False)
         elif action == ActionSymbol.pnum:
             self.pnum(curr_token)
+            self.semantic_analyzer.push_type(curr_token, AttributeType.VAR, self.current_scope_func)
         else:
             raise Exception("Invalid action symbol")
 
@@ -438,6 +452,8 @@ class InterCodeGen:
             print("ERROR")
         self.stack.append(temp)
 
+        return right_hand_side, left_hand_side
+
     def addop(self):
         right_hand_side = self.stack.pop()
         operator = self.stack.pop().lexeme
@@ -451,12 +467,16 @@ class InterCodeGen:
             print("ERROR")
         self.stack.append(temp)
 
+        return right_hand_side, left_hand_side
+
     def mult(self):
         right_hand_side = self.stack.pop()
         left_hand_side = self.stack.pop()
         temp = self.get_temp()
         self.code.append(mult([left_hand_side, right_hand_side, temp]))
         self.stack.append(temp)
+
+        return right_hand_side, left_hand_side
 
     def start_args(self):
         self.stack.append(START_ARGS_SYMBOL)
@@ -484,7 +504,7 @@ class InterCodeGen:
             self.code.append(assign([RETURN_VARIABLE, temp]))
             self.stack.append(temp)
 
-        return len(args), func_ptr
+        return args, func_ptr
 
     def return_result(self):
         self.code.append(assign([self.stack.pop(), RETURN_VARIABLE]))
@@ -526,6 +546,8 @@ class InterCodeGen:
                     or variable.type == AttributeType.PAR_ARR \
                     or variable.type == AttributeType.LOCAL_ARR:
                 self.stack.append(indirect(variable.ptr))
+
+            return variable
         else:
             self.stack.append(-1)
 
