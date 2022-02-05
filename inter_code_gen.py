@@ -600,5 +600,5 @@ class InterCodeGen:
             f.write('The code has not been generated.'.encode())
         else:
             for index, inter_code in enumerate(self.code):
-                f.write(f'{index}.\t{str(inter_code)}\n'.encode())
+                f.write(f'{index}\t{str(inter_code)}\n'.encode())
         f.close()

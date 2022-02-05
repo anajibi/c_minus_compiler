@@ -169,8 +169,8 @@ class Parser:
                         else:
                             curr_state.state = token_or_state
 
-        Parser.save_tree(head)
-        Parser.save_syntax_errors(syntax_errors)
+        # Parser.save_tree(head)
+        # Parser.save_syntax_errors(syntax_errors)
 
         semantic_errors = self.inter_code_gen.semantic_analyzer.semantic_errors
         Parser.save_semantic_errors(semantic_errors)

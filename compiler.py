@@ -1,4 +1,4 @@
-from parser import Parser
+from my_parser import Parser
 from scanner import Scanner
 from inter_code_gen import InterCodeGen
 

@@ -151,12 +151,12 @@ class SemanticAnalyzer:
             self.insert_in_type_dict(current_scope_func, curr_token.lexeme, CheckingType.INT)
         elif type_val == AttributeType.FUNC:
             self.type_stack.append(CheckingType.FUNC)
-            self.type_dict[current_scope_func][curr_token.lexeme] = CheckingType.FUNC
+            self.insert_in_type_dict(current_scope_func, curr_token.lexeme, CheckingType.FUNC)
         elif type_val == AttributeType.ARR \
                 or type_val == AttributeType.PAR_ARR \
                 or type_val == AttributeType.LOCAL_ARR:
             self.type_stack.append(CheckingType.ARR)
-            self.type_dict[current_scope_func][curr_token.lexeme] = CheckingType.ARR
+            self.insert_in_type_dict(current_scope_func, curr_token.lexeme, CheckingType.ARR)
 
     def empty_type_stack(self):
         self.type_stack = []

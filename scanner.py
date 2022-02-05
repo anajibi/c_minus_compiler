@@ -5,8 +5,8 @@ import re
 
 from declarations import Token, TokenType
 
-lexical_error_log = open(LEXICAL_ERRORS_FILE_NAME, "w")
-symbol_table_log = open(SYMBOL_TABLE_FILE_NAME, "w")
+# lexical_error_log = open(LEXICAL_ERRORS_FILE_NAME, "w")
+# symbol_table_log = open(SYMBOL_TABLE_FILE_NAME, "w")
 input_file = open(INPUT_FILE_NAME, "r", encoding="UTF-8")
 
 
@@ -182,32 +182,32 @@ class Scanner:
                 LexicalError(self.current_lexeme, error_type))
         self.current_lexeme = ""
 
-    def write_lexical_errors(self):
-        if len(self.lexical_errors) != 0:
-            lexical_error_log.write(f"{self.line_number - 1}.\t")
-            error: LexicalError
-            for error in self.lexical_errors:
-                lexical_error_log.write(
-                    f"({error.dumped_lexeme}, {error.error_type}) ")
-            lexical_error_log.write("\n")
-        self.lexical_errors = {}
-
-    def print_symbol_table(self):
-        index = 0
-        for symbol in self.symbol_table:
-            index += 1
-            symbol_table_log.write(f"{index}.\t{symbol}\n")
-
-    def print_lexical_errors(self):
-        if len(self.lexical_errors) != 0:
-            for key in sorted(self.lexical_errors.keys()):
-                lexical_error_log.write(f"{key}.\t")
-                for error in self.lexical_errors[key]:
-                    lexical_error_log.write(
-                        f"({error.dumped_lexeme}, {error.error_type}) ")
-                lexical_error_log.write("\n")
-        else:
-            lexical_error_log.write("There is no lexical error.")
+    # def write_lexical_errors(self):
+    #     if len(self.lexical_errors) != 0:
+    #         lexical_error_log.write(f"{self.line_number - 1}.\t")
+    #         error: LexicalError
+    #         for error in self.lexical_errors:
+    #             lexical_error_log.write(
+    #                 f"({error.dumped_lexeme}, {error.error_type}) ")
+    #         lexical_error_log.write("\n")
+    #     self.lexical_errors = {}
+    #
+    # def print_symbol_table(self):
+    #     index = 0
+    #     for symbol in self.symbol_table:
+    #         index += 1
+    #         symbol_table_log.write(f"{index}.\t{symbol}\n")
+    #
+    # def print_lexical_errors(self):
+    #     if len(self.lexical_errors) != 0:
+    #         for key in sorted(self.lexical_errors.keys()):
+    #             lexical_error_log.write(f"{key}.\t")
+    #             for error in self.lexical_errors[key]:
+    #                 lexical_error_log.write(
+    #                     f"({error.dumped_lexeme}, {error.error_type}) ")
+    #             lexical_error_log.write("\n")
+    #     else:
+    #         lexical_error_log.write("There is no lexical error.")
 
 
 class LexicalError:
